@@ -119,7 +119,7 @@ Accept only if faces remain legible, the six vertical panels remain stable, moti
 
 - [ ] **Step 4: Remove only the explicit current-run temporary files**
 
-Move these seven named files to the Trash after verification: the full preview GIF, the three Gate 1 PNGs, and the three delivery PNGs. Also move any failed current-run candidate by its exact name if one is created during execution. Do not use a wildcard or recursive deletion.
+Move these seven named files to the Trash after verification: the full preview GIF, the three Gate 1 PNGs, and the three delivery PNGs. Also move any failed current-run candidate by its exact name if one is created during execution. Remove the now-empty `output/rt100pro/source-check/` directory with `rmdir`. Do not use a wildcard or recursive deletion.
 
 - [ ] **Step 5: Re-run verification after cleanup**
 
