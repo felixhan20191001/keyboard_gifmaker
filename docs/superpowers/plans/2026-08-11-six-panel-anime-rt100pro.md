@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Produce a verified three-second RT100 Pro looping GIF from the approved interval of the supplied square MP4.
+**Goal:** Produce a verified 3.2-second RT100 Pro looping GIF from the highest-motion window inside the approved interval of the supplied square MP4.
 
-**Architecture:** Copy the approved source into the delivery directory, validate it, and make a temporary full-length display-size GIF for conversion review. Render the approved interval directly from the MP4 with an optimised palette, verify metadata and representative frames, then remove only the explicitly named current-run temporary files.
+**Architecture:** Copy the approved source into the delivery directory, validate it, and make a temporary full-length display-size GIF for conversion review. Render the highest-motion source window as a forward/reverse loop without duplicated endpoint frames, verify metadata and representative frames, then remove only the explicitly named current-run temporary files.
 
 **Tech Stack:** ffmpeg, ffprobe, bundled Python RT100 Pro GIF verifier.
 
@@ -13,8 +13,9 @@
 - Input: `/Users/hanpengfei/Downloads/grok-video-ff69830c-b11d-498b-ae7d-65ced10494b6.mp4`.
 - Retained source: `output/rt100pro/six-panel-anime-source.mp4`.
 - Delivery: `output/rt100pro/six-panel-anime-rt100pro.gif`.
-- Selection: `2.9-5.9` seconds, for a three-second animation.
-- Output: 240x240, 10fps, up to 256 colours, infinite looping, about 30 frames.
+- Selection: the `4.2-5.9` second high-motion window inside the approved `2.9-5.9` second range.
+- Loop construction: 17 forward frames followed by forward frames 15 through 1 in reverse, with neither endpoint duplicated.
+- Output: 240x240, 10fps, up to 256 colours, infinite looping, 32 frames and 3.2 seconds.
 - Preserve the square six-panel composition and render directly from the MP4 without audio.
 - Retain only the named source MP4 and final GIF from this run after verification.
 
@@ -73,6 +74,8 @@ Confirm that it is decodable GIF data and that motion remains readable at 240x24
 
 **Files:**
 - Create: `output/rt100pro/six-panel-anime-rt100pro.gif`
+- Create temporarily: `output/rt100pro/six-panel-anime-failed-straight-cut.gif`
+- Create temporarily: `output/rt100pro/six-panel-anime-failed-pingpong-timing.gif`
 - Create temporarily: `output/rt100pro/source-check/six-panel-anime-selected-early.png`
 - Create temporarily: `output/rt100pro/source-check/six-panel-anime-selected-middle.png`
 - Create temporarily: `output/rt100pro/source-check/six-panel-anime-selected-late.png`
@@ -80,16 +83,18 @@ Confirm that it is decodable GIF data and that motion remains readable at 240x24
 - Retain: `output/rt100pro/six-panel-anime-rt100pro.gif`
 
 **Interfaces:**
-- Consumes: the approved source from Task 1 and the approved `2.9-5.9` second interval.
+- Consumes: the approved source from Task 1 and the `4.2-5.9` second high-motion window inside the approved interval.
 - Produces: the verified RT100 Pro GIF and exactly two retained current-run files.
 
-- [ ] **Step 1: Render the selected interval directly from the MP4**
+- [ ] **Step 1: Preserve the failed straight-cut diagnostic and render the seamless forward/reverse loop**
 
 ```zsh
-ffmpeg -hide_banner -loglevel error -ss 2.9 -t 3.0 \
+mv output/rt100pro/six-panel-anime-rt100pro.gif \
+  output/rt100pro/six-panel-anime-failed-straight-cut.gif
+ffmpeg -hide_banner -loglevel error -ss 4.2 -t 1.7 \
   -i output/rt100pro/six-panel-anime-source.mp4 \
-  -filter_complex "[0:v]fps=10,scale=240:240:flags=lanczos,split[frames][palette_source];[palette_source]palettegen=max_colors=256:stats_mode=diff[palette];[frames][palette]paletteuse=dither=sierra2_4a" \
-  -loop 0 output/rt100pro/six-panel-anime-rt100pro.gif
+  -filter_complex "[0:v]fps=10,scale=240:240:flags=lanczos,trim=end_frame=17,setpts=PTS-STARTPTS,split[fwdsrc][revsrc];[fwdsrc]setpts=PTS-STARTPTS[fwd];[revsrc]trim=start_frame=1:end_frame=16,setpts=PTS-STARTPTS,reverse,setpts=PTS-STARTPTS[rev];[fwd][rev]concat=n=2:v=1:a=0[loop];[loop]split[frames][palette_source];[palette_source]palettegen=max_colors=256:stats_mode=diff[palette];[frames][palette]paletteuse=dither=sierra2_4a" \
+  -loop 0 -final_delay 10 output/rt100pro/six-panel-anime-rt100pro.gif
 ```
 
 - [ ] **Step 2: Run the delivery verifier and independent metadata check**
@@ -102,16 +107,16 @@ ffprobe -v error \
   -of default=noprint_wrappers=1 output/rt100pro/six-panel-anime-rt100pro.gif
 ```
 
-Expected: verifier pass, GIF data, 240x240, 10fps, infinite loop, and no more than 30 frames for the approved interval.
+Expected: verifier pass, GIF data, 240x240, 10fps, infinite loop, 32 frames, and 3.2 seconds.
 
 - [ ] **Step 3: Extract and visually inspect representative delivery frames**
 
 ```zsh
 ffmpeg -hide_banner -loglevel error -ss 0 -i output/rt100pro/six-panel-anime-rt100pro.gif \
   -frames:v 1 output/rt100pro/source-check/six-panel-anime-selected-early.png
-ffmpeg -hide_banner -loglevel error -ss 1.5 -i output/rt100pro/six-panel-anime-rt100pro.gif \
+ffmpeg -hide_banner -loglevel error -ss 1.6 -i output/rt100pro/six-panel-anime-rt100pro.gif \
   -frames:v 1 output/rt100pro/source-check/six-panel-anime-selected-middle.png
-ffmpeg -hide_banner -loglevel error -ss 2.9 -i output/rt100pro/six-panel-anime-rt100pro.gif \
+ffmpeg -hide_banner -loglevel error -ss 3.1 -i output/rt100pro/six-panel-anime-rt100pro.gif \
   -frames:v 1 output/rt100pro/source-check/six-panel-anime-selected-late.png
 ```
 
@@ -119,7 +124,7 @@ Accept only if faces remain legible, the six vertical panels remain stable, moti
 
 - [ ] **Step 4: Remove only the explicit current-run temporary files**
 
-Move these seven named files to the Trash after verification: the full preview GIF, the three Gate 1 PNGs, and the three delivery PNGs. Also move any failed current-run candidate by its exact name if one is created during execution. Remove the now-empty `output/rt100pro/source-check/` directory with `rmdir`. Do not use a wildcard or recursive deletion.
+Move these nine named files to the Trash after verification: the full preview GIF, the failed straight-cut GIF, the failed ping-pong timing GIF, the three Gate 1 PNGs, and the three delivery PNGs. Remove the now-empty `output/rt100pro/source-check/` directory with `rmdir`. Do not use a wildcard or recursive deletion.
 
 - [ ] **Step 5: Re-run verification after cleanup**
 

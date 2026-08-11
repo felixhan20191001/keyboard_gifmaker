@@ -8,15 +8,16 @@ Create a compact, keyboard-ready looping GIF from the supplied six-second square
 
 - Input: `/Users/hanpengfei/Downloads/grok-video-ff69830c-b11d-498b-ae7d-65ced10494b6.mp4`.
 - The source is a decodable 544x544 H.264 video lasting about 6.04 seconds.
-- Use the approved `2.9-5.9` second interval, giving a three-second animation.
+- Use the most active `4.2-5.9` second source window inside the approved `2.9-5.9` second interval.
+- Play the 17 sampled frames forward, then frames 15 through 1 in reverse, avoiding duplicate endpoint frames and producing a clean 3.2-second loop.
 - Preserve the existing square six-panel composition without cropping or camera changes.
 - Remove audio from GIF output.
 
 ## Rendering
 
 1. Create a temporary full-length GIF at display size to confirm that the source converts correctly and to review the complete motion.
-2. Render the approved interval directly from the original MP4, rather than recompressing the temporary GIF.
-3. Produce a 240x240 GIF at 10fps with up to 256 colours, infinite looping, and about 30 frames.
+2. Render the approved high-motion source window directly from the original MP4, rather than recompressing the temporary GIF.
+3. Produce a 240x240 GIF at 10fps with up to 256 colours, infinite looping, and 32 frames.
 4. Use palette generation and palette application to retain detail and smooth gradients at keyboard-screen size.
 
 ## Quality Gates and Cleanup
