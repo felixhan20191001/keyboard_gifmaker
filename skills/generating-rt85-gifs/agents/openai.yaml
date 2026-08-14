@@ -1,0 +1,4 @@
+interface:
+  display_name: "RT85 GIF Studio"
+  short_description: "为 EPOMAKER RT85 生成循环屏幕 GIF"
+  default_prompt: "Use $generating-rt85-gifs to turn my reference image into an RT85 GIF."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "RT100 Pro GIF Studio"
+  short_description: "为 EPOMAKER RT100 Pro 生成循环屏幕 GIF"
+  default_prompt: "Use $generating-rt100pro-gifs to turn my reference image into an RT100 Pro GIF."

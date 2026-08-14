@@ -1,0 +1,4 @@
+interface:
+  display_name: "QK100 Mk2 GIF Studio"
+  short_description: "为 Qwertykeys QK100 Mk2 生成 135x240 循环屏幕 GIF"
+  default_prompt: "Use $generating-qk100-gifs to turn my reference image into a QK100 Mk2 GIF."

@@ -1,1 +1,11 @@
 .worktrees/
+.venv/
+.DS_Store
+**/__pycache__/
+*.pyc
+
+# pipeline intermediates, not deliverables
+output/**/source-check*/
+output/**/delivery-check*/
+output/**/*-frames/
+output/**/*-check/
