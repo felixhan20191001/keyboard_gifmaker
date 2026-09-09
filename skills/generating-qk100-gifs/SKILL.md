@@ -46,8 +46,8 @@ Inspect the supplied image or video. If neither is supplied, ask for one. Keep a
 
 Before any `image_to_video` call, decide whether the user still already shows the **entire character**:
 
-- **Full body already:** head, hair, both hands, torso, legs, and feet (plus cape, tail, weapon, or other attached props) are all visible with usable margins. Use that image (after 9:16 / dance-pose edit if needed) as `$FULLBODY_STILL`.
-- **Not full body:** half-body, chest-up, headshot, seated crop, missing feet, or any cut-off limbs. **Do not animate this crop.** First generate a new **9:16 full-body photograph/illustration** of the **same character** with `image_edit` (preferred in Grok Build) or Imagine image editing via `grok --single`. Preserve exact face, hair, outfit, body type, and style. Complete the unseen lower body consistently with the visible costume. Compact upright dance-ready stance, small margins, both hands in the collarbone-to-waist band, never overhead. Save it as `output/qk100/*-fullbody.png`. Inspect the new still: if feet, head, or hands are still missing, edit once more. Only then set `$FULLBODY_STILL` to this generated file.
+- **Full body already:** head, hair, both hands, torso, legs, and feet (plus cape, tail, weapon, or other attached props) are all visible with usable margins. Use that image (after 9:16 / home-pose edit if needed) as `$FULLBODY_STILL`.
+- **Not full body:** half-body, chest-up, headshot, seated crop, missing feet, or any cut-off limbs. **Do not animate this crop.** First generate a new **9:16 full-body photograph/illustration** of the **same character** with `image_edit` (preferred in Grok Build) or Imagine image editing via `grok --single`. Preserve exact face, hair, outfit, body type, and style. Complete the unseen lower body consistently with the visible costume. Compact upright **home pose**: feet together, arms relaxed at the sides, small margins, never overhead. Save it as `output/qk100/*-fullbody.png`. Inspect the new still: if feet, head, or hands are still missing, edit once more. Only then set `$FULLBODY_STILL` to this generated file.
 
 Never call `image_to_video` on a non-full-body user crop. Never invent a different character.
 
@@ -57,17 +57,27 @@ The QK100 Mk2 GIF panel is a **tall 9:16 strip**, 135 px wide. Do **not** reuse 
 
 - Compose for **portrait 9:16**, then scale **exactly to 135×240**.
 - The character must be **full body in frame** for the reference still and every video frame: head, hair, both hands, torso, legs, and feet (plus cape, tail, weapon, or other attached props). Leave a small margin on all four sides so nothing is clipped.
-- Center the subject; 135 px is very narrow, so keep the stance compact and upright. Do not use wide arm spans.
-- Lock the **hand activity band** between the **collarbone and waist**. Hands must never rise above the head.
+- Center the subject; 135 px is very narrow, so keep the stance compact and upright. Shoulder-height fists are allowed; a full T-pose is not — elbows stay close enough that both arms remain inside the 9:16 frame.
+- Hands stay at or below the head. Expected beats use shoulder-height fists, a chest-height palm push toward camera, a hand on the hip, and both hands meeting at the chest. Hands must never rise above the head.
 - Avoid chest-up crops, head-and-shoulders close-ups, and any pose that needs horizontal space.
 
 ### Default motion contract
 
-Use every explicit motion instruction. Otherwise, use this **QK100-only** default: a **cheerful, upbeat full-body portrait loop dance** that **loops seamlessly**. Do **not** apply the RT100 Pro overhead-hands dance, the RT85 landscape lounge, or a slow languid sway.
+Use every explicit motion instruction. Otherwise, use this **QK100-only** default: a **seamless full-body portrait loop** of the in-place phrase below. Do **not** apply the RT100 Pro overhead-hands dance, the RT85 landscape lounge, or a slow languid sway.
 
-Keep the full body inside the 9:16 frame for the entire clip. Keep both hands inside the collarbone-to-waist band as a lively dance silhouette: one hand near the collarbone, neck, or hairline with quick wrist flicks; the other on the hip or waist snapping to the beat; fingers lively, not limp. Drive a **brighter in-place two-beat dance**: a clear even left-right weight hop that stays planted, a springy knee bounce on every beat, a peppy waist-and-hip sway or small figure-eight, a bouncy shoulder roll, a playful head bob, and a smile or bright glance that returns to center. Hair, clothing, cape, and jewelry bounce a half-beat behind. For clearly adult characters, keep the mood fun, flirtatious, and energetic—tasteful, non-explicit, not slow or sleepy. For childlike or age-ambiguous subjects, keep the same upbeat loop geometry but cute/playful only. No overhead arms, no big jumps that leave the ground for long, no travel that walks the figure out of frame, no large arm swings, and no camera-only fake motion.
+Keep the full body inside the 9:16 frame for the entire clip. Hands stay at or below the head; keep elbows compact enough that both arms remain inside the portrait. Feet stay on the ground with only small in-place steps.
 
-**Seamless loop (mandatory):** begin and end in the **same centred full-body dance-ready pose**, with matching hand placement, hip position, knee bend, weight, and hair/cape follow-through. Hold that pose for the first ~0.4 s and return to it by ~5.2 s, holding the last ~0.8 s. Early and late frames must be visually interchangeable so the GIF does not jump. Include every listed beat in the Grok prompt unless the user requests different motion. Preserve identity, anatomy, outfit, and mood. Keep the camera locked unless the user asks otherwise.
+Drive this phrase on every default run (include every beat in the video prompt):
+
+1. **Home pose** — centred, feet together, arms relaxed at the sides, slight smile, facing camera.
+2. **Shoulder-fist bounce** — both hands rise to loose fists at shoulder height and pump on the beat; springy knee bounce; small left-right weight hop in place.
+3. **Hip-pop camera-push** — one hand drops to the hip; the other palm pulses toward the camera at chest height; hips pop hard to the side with a waist body-wave; knees keep bouncing.
+4. **Chest-frame** — both hands briefly meet or cross at the chest, then open.
+5. Return to the **home pose**.
+
+Hair, clothing, cape, and jewelry follow a half-beat behind. For clearly adult characters, keep the mood fun, flirtatious, and energetic—tasteful, non-explicit. For childlike or age-ambiguous subjects, keep the same geometry but cute/playful only. No overhead arms, no big jumps that leave the ground for long, no travel that walks the figure out of frame, and no camera-only fake motion.
+
+**Seamless loop (mandatory):** begin and end in the **same centred home pose** (feet together, arms relaxed at the sides), with matching hip position, knee bend, weight, and hair/cape follow-through. Hold that pose for the first ~0.4 s and return to it by ~5.2 s, holding the last ~0.8 s. Early and late frames must be visually interchangeable so the GIF does not jump. Include every listed beat in the Grok prompt unless the user requests different motion. Preserve identity, anatomy, outfit, and mood. Keep the camera locked unless the user asks otherwise.
 
 ## 2. Produce the Source MP4 through Local Grok Imagine
 
@@ -76,8 +86,8 @@ If the user supplies a usable MP4, use it as `$SOURCE_MP4` and start at Gate 1. 
 **Preferred in a Grok Build / Grok TUI session:**
 
 1. Resolve `$FULLBODY_STILL` as above. If the user image was not full body, this **must** be the newly generated full-body still, not the original crop.
-2. If `$FULLBODY_STILL` is full body but not yet dance-ready or not 9:16, `image_edit` it into a **full-body dance-ready pose** (one hand near collarbone/hair, the other on the hip). Do **not** convert the pose to overhead hands or crop to chest-up.
-3. Call `image_to_video` **only** on `$FULLBODY_STILL` (locked camera, 6 s). The video prompt must require **full body in every frame** and a **seamless loop** (same pose at start and end, hold first ~0.4 s / return by ~5.2 s / hold last ~0.8 s). Copy the MP4 to `output/qk100/*-source.mp4`.
+2. If `$FULLBODY_STILL` is full body but not yet the dance **home pose** or not 9:16, `image_edit` it into a **full-body home pose**: feet together, arms relaxed at the sides, compact, facing camera. Do **not** convert the pose to overhead hands or crop to chest-up.
+3. Call `image_to_video` **only** on `$FULLBODY_STILL` (locked camera, 6 s). The video prompt must require **full body in every frame**, every default-phrase beat (shoulder-fist bounce, hip-pop camera-push, chest-frame), and a **seamless loop** (same home pose at start and end, hold first ~0.4 s / return by ~5.2 s / hold last ~0.8 s). Copy the MP4 to `output/qk100/*-source.mp4`.
 
 **Otherwise (Codex or shell-only):**
 
@@ -89,7 +99,7 @@ grok --single "$PROMPT" --max-turns 8 --permission-mode auto --always-approve \
 
 If `image_to_video` is unavailable, report `IMAGE_TO_VIDEO_UNAVAILABLE` and stop. Never replace it with zoom, pan, scale, parallax, a slideshow, or another static-image fallback.
 
-Request one locked-camera, **9:16 portrait**, 6-second source MP4. The prompt must name **`$FULLBODY_STILL`** (the generated full-body photo when the user crop was incomplete), **full body in every frame**, required motion (every default loop-dance beat when no user motion is supplied), and the **seamless loop seam** (identical centred full-body dance-ready pose at start and end).
+Request one locked-camera, **9:16 portrait**, 6-second source MP4. The prompt must name **`$FULLBODY_STILL`** (the generated full-body photo when the user crop was incomplete), **full body in every frame**, required motion (every default-phrase beat when no user motion is supplied), and the **seamless loop seam** (identical centred home pose at start and end).
 
 ## Gate 1 — Approve the Source Before Converting
 
@@ -102,7 +112,7 @@ ffmpeg -hide_banner -loglevel error -ss 3 -i "$SOURCE_MP4" -frames:v 1 output/qk
 ffmpeg -hide_banner -loglevel error -ss 5.8 -i "$SOURCE_MP4" -frames:v 1 output/qk100/source-check/late.png
 ```
 
-Reject a zero-byte, incomplete, static, or whole-frame-only scale/translation source. When the default loop-dance contract applies, early / middle / late frames must show the **entire body** (head, hands, feet, and attached props) inside the **9:16** frame, hands in the collarbone-to-waist dance band, and a visible **upbeat** left-right weight hop, springy knee bounce, shoulder bounce, and waist/hip dance motion. Reject chest-up crops, cropped feet or head, overhead hands, frozen arms, a sleepy or near-still sway, missing bounce, or abrupt snaps. If the 5.5 s endpoint MAE at 135×240 is above 12, search a real in-source loop window or regenerate; do not ship a jumping loop. Regenerate with `image_to_video`; never repair with ffmpeg.
+Reject a zero-byte, incomplete, static, or whole-frame-only scale/translation source. When the default loop-dance contract applies, early / middle / late frames must show the **entire body** (head, hands, feet, and attached props) inside the **9:16** frame. Early and late should match the **home pose** (feet together, arms relaxed at the sides). The middle frame must show the default phrase: a **shoulder-fist bounce** and/or the **hip-pop + camera-push**, with springy knees. Reject chest-up crops, cropped feet or head, overhead hands, frozen arms, a sleepy or near-still sway, missing hip-pop, missing bounce, or abrupt snaps. If the 5.5 s endpoint MAE at 135×240 is above 12, search a real in-source loop window or regenerate; do not ship a jumping loop. Regenerate with `image_to_video`; never repair with ffmpeg.
 
 ## 3. Render the QK100 Mk2 GIF
 
@@ -134,7 +144,7 @@ ffprobe -v error -show_entries format=format_name,duration,size:stream=codec_nam
   -of default=noprint_wrappers=1 "$OUTPUT_GIF"
 ```
 
-Deliver only when the verifier passes, the file is GIF data, it is **exactly 135×240**, it has **2–128 frames** and `loop=0`, the endpoint MAE is ≤ 12, and frames stay legible at 135×240. When the default loop-dance applies, representative frames must keep the **full body** in frame, hands in the chest-band dance pose, and a readable **upbeat** hip / knee-bounce / left-right rhythm. First and last delivery frames must match closely enough that the loop is seamless.
+Deliver only when the verifier passes, the file is GIF data, it is **exactly 135×240**, it has **2–128 frames** and `loop=0`, the endpoint MAE is ≤ 12, and frames stay legible at 135×240. When the default loop-dance applies, representative frames must keep the **full body** in frame and a readable default phrase (shoulder-fist bounce, hip-pop, camera-push). First and last delivery frames must match closely enough that the loop is seamless.
 
 State the final path, **135×240**, duration, frame count, and file size. Upload with the **QK100 Mk2 connected by USB** through **QK Config** (Fun Screen / Display / import GIF). Official connect hint: `Fn+H`.
 
