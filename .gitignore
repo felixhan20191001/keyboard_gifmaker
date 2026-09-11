@@ -4,8 +4,5 @@
 **/__pycache__/
 *.pyc
 
-# pipeline intermediates, not deliverables
-output/**/source-check*/
-output/**/delivery-check*/
-output/**/*-frames/
-output/**/*-check/
+# generated GIFs, source MP4s, and run folders — keep locally, do not commit
+output/
