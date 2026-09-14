@@ -10,7 +10,9 @@ Pipelines for making loop GIFs that fit keyboard mini-screens:
 
 Each skill is a standalone package: `SKILL.md`, `scripts/`, and `agents/`.
 
-## Install a skill
+> **Grok Bot agents:** you are on branch **`grokbot`**. Read **[README.grokbot.md](README.grokbot.md)** and each package’s **`GROKBOT.md`** before generating. Stills → Grok CLI; video → grok.com Imagine (Imagine出片); GIF → existing scripts.
+
+## Install a skill (Grok Build / Codex — `master` workflow)
 
 Copy or symlink one package into your Grok / Codex skills directory:
 
@@ -23,7 +25,8 @@ Zipped copies live in `skills/packages/`.
 
 ## Layout
 
-- `skills/` — the three screen-GIF skills
+- `skills/` — the three screen-GIF skills (+ `GROKBOT.md` overrides on this branch)
+- `skills/GROKBOT-BACKEND.md` — shared Grok Bot generation backends
 - `output/rt100pro/`, `output/rt85/`, `output/qk100/` — generated GIFs and source MP4s
 - `tools/` — local helpers used by earlier RT100 Pro runs
 - `docs/` — design notes for the six-panel RT100 Pro GIF
