@@ -112,7 +112,7 @@ ffmpeg -hide_banner -loglevel error -ss "$(ffprobe -v error -show_entries format
 ffmpeg -hide_banner -loglevel error -sseof -0.04 -i "$SOURCE_MP4" -frames:v 1 output/qk100/source-check/late.png
 ```
 
-Reject a zero-byte, incomplete, static, or whole-frame-only scale/translation source. When the default loop-dance contract applies, early / middle / late frames must show the **entire body** (head, hands, feet, and attached props) inside the **9:16** frame. Early and late must match the **home pose** (feet together, arms relaxed at the sides) because `last_frame` pinned that still. The middle frame must show the default phrase: a **shoulder-fist bounce** and/or the **hip-pop + camera-push**, with springy knees. Reject chest-up crops, cropped feet or head, overhead hands, frozen arms, a sleepy or near-still sway, missing hip-pop, missing bounce, or abrupt snaps. If endpoint MAE at 135×240 is above 12, regenerate with `image` + `last_frame` both set to `$FULLBODY_STILL`; do not ship a jumping loop. Never repair with ffmpeg.
+Reject a zero-byte, incomplete, static, or whole-frame-only scale/translation source. When the default loop-dance contract applies, early / middle / late frames must show the **entire body** (head, hands, feet, and attached props) inside the **9:16** frame. Early and late must match the **home pose** (feet together, arms relaxed at the sides) because `last_frame` pinned that still. The middle frame must show the default phrase: a **shoulder-fist bounce** and/or the **hip-pop + camera-push**, with springy knees. Reject chest-up crops, cropped feet or head, overhead hands, frozen arms, a sleepy or near-still sway, missing hip-pop, missing bounce, or abrupt snaps. If the verifier reports a loop jump (endpoint RGB MAE above **1.3×** median consecutive-frame MAE **and** above 12), regenerate with `image` + `last_frame` both set to `$FULLBODY_STILL`; do not ship a jumping loop. A raw MAE above 12 alone is a high-texture warn. Never repair with ffmpeg.
 
 ## 3. Render the QK100 Mk2 GIF
 
@@ -144,7 +144,7 @@ ffprobe -v error -show_entries format=format_name,duration,size:stream=codec_nam
   -of default=noprint_wrappers=1 "$OUTPUT_GIF"
 ```
 
-Deliver only when the verifier passes, the file is GIF data, it is **exactly 135×240**, it has **2–128 frames** and `loop=0`, the endpoint MAE is ≤ 12, and frames stay legible at 135×240. When the default loop-dance applies, representative frames must keep the **full body** in frame and a readable default phrase (shoulder-fist bounce, hip-pop, camera-push). First and last delivery frames must match closely enough that the loop is seamless.
+Deliver only when the verifier passes, the file is GIF data, it is **exactly 135×240**, it has **2–128 frames** and `loop=0`, the loop check passes (endpoint RGB MAE ≤ **1.3×** consecutive-step MAE **or** ≤ 12), and frames stay legible at 135×240. When the default loop-dance applies, representative frames must keep the **full body** in frame and a readable default phrase (shoulder-fist bounce, hip-pop, camera-push). First and last delivery frames must match closely enough that the loop is seamless.
 
 State the final path, **135×240**, duration, frame count, and file size. Upload with the **QK100 Mk2 connected by USB** through **QK Config** (Fun Screen / Display / import GIF). Official connect hint: `Fn+H`.
 

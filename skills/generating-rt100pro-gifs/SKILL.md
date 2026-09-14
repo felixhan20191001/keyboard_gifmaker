@@ -51,11 +51,11 @@ For the 1.54-inch screen, prioritize the face, upper torso, hands, hip shift, an
 
 Use this contract only after the user chose it (or named equivalent motion such as 回眸 / 三镜头 / glance / 回身 / 写真). Stay **standing** and **square**. Do not copy the RT85 recumbent landscape pages here.
 
-The GIF plays **three hard-cut 1:1 photobook pages**, then loops. Drama is the **cut between poses**, not the same 回身 three times. Inside each shot the page pose **holds** while **readable idle** plays (the 240×240 square can show it — do not freeze into a still). A **slow camera push-in** runs on **every** shot, including the first two.
+The GIF plays **three hard-cut 1:1 photobook pages**, then loops. Drama is the **cut between poses**, not the same 回身 three times. Inside each shot the page pose **holds** while **readable idle** plays (the 240×240 square can show it — do not freeze into a still). Eyes stay open on every shot; idle is breath, weight, and hair/fabric, not a blink. A **slow camera push-in** runs on **every** shot, including the first two.
 
 1. **Cover — standing full body** (~1.0 s in the GIF) — crown to heels, figure filling the square. Body mostly back / 3/4 back, looking aside. Idle: breath, a small weight shift, hair / skirt / cape in a side wind. Push-in must still show the feet at the end of the 1.0 s trim.
 2. **Inner page — standing upper body** (~2.0 s) — crown to hips; face, shoulders, and the waist hand readable at 240×240. Eyes on camera; one hand rests on the waist as a held editorial gesture. Idle: breath, a small shoulder move, a tiny adjustment of the waist hand, hair and sleeves in wind. Push-in must stay crown-to-hips, not become a face-only crop.
-3. **Close-up — standing face** (~2.0 s) — over-the-shoulder / frontal face filling the square. Direct gaze. Idle: one slow blink, hair strands and earrings, slight breath. Push-in keeps hair inside the top edge.
+3. **Close-up — standing face** (~2.0 s) — over-the-shoulder / frontal face filling the square. Direct gaze, eyes stay open. Idle: slight breath, hair strands and earrings. Push-in keeps hair inside the top edge.
 
 Do not repeat a full 回身 on every shot. Do not mix in the step-touch dance. No travelling, spins, or overhead arms. Idle must be visible at 240×240 but stay planted.
 
@@ -65,7 +65,7 @@ If the user supplies **one image per shot**, use each file as that page's identi
 
 If only one still is supplied, start from a square **cover** still (looking aside, original scene kept). `image_edit` one **inner** still of the same standing figure: eyes on camera, waist hand held, same garment, same scene. Prefer **pixel-crop** upper and face from that inner still. Use `image_edit` for those crops only if a 1:1 window cannot cover crown-to-hips or the face without cutting the subject; then pass the still twice, `1:1`, and reject identity drift.
 
-Because a face close-up cannot match a full-body first frame, **bookend the assembled GIF with a copy of the first full-body frame** as the last frame so endpoint MAE stays ≤ 12. Do not crossfade the cuts.
+Because a face close-up cannot match a full-body first frame, **bookend the assembled GIF with a copy of the first full-body frame** as the last frame so the loop returns to the cover. Do not crossfade the cuts.
 
 ## 2. Produce the Source MP4 through Local Grok Imagine
 
@@ -78,7 +78,7 @@ If the user supplies a usable MP4, use it as `$SOURCE_MP4` and start at Gate 1. 
 **Motion B:** do not animate the original crop. After the square cover still, inner still, and face still (original scenes kept), one 6 s clip per page:
 
 1. Call **`image_to_video`** (1:1, 6 s) from that shot's still (cover full body, inner upper, face close-up). Use **`reference_to_video`** with the same still twice if you need a tighter identity lock. Save the three 6 s clips as `$RUN_DIR/*-cover.mp4`, `*-upper.mp4`, and `*-face.mp4`. Do **not** delete them after the GIF is done.
-2. The prompt must require: hold the photobook pose of the still; **readable idle** (shot 1 breath + weight shift; shot 2 breath + shoulder / waist-hand; shot 3 blink + breath); a gentle continuous side wind on hair and clothes (no whip); a **slow gentle camera push-in** on the lens axis; no pan, no sit-up, no walk-out, no pull-back; shot 1 keeps looking aside and keeps the feet in frame; shot 2 keeps the gaze and the waist hand and stays crown-to-hips; shot 3 holds the gaze (one slow blink allowed) and keeps hair in the top edge; the **original scene stays stable** every frame. Fall back to `image_to_video` if `reference_to_video` is unavailable.
+2. The prompt must require: hold the photobook pose of the still; **readable idle** (shot 1 breath + weight shift; shot 2 breath + shoulder / waist-hand; shot 3 breath); a gentle continuous side wind on hair and clothes (no whip); a **slow gentle camera push-in** on the lens axis; no pan, no sit-up, no walk-out, no pull-back; shot 1 keeps looking aside and keeps the feet in frame; shot 2 keeps the gaze and the waist hand and stays crown-to-hips; shot 3 holds the gaze with eyes open and keeps hair in the top edge; eyes stay open on every shot; the **original scene stays stable** every frame. Fall back to `image_to_video` if `reference_to_video` is unavailable.
 3. After Gate 1 on each clip, trim **10 + 20 + 20 frames** at 10 fps (1.0 s cover, 2.0 s inner, 2.0 s face) from the portion where idle, wind, and the push-in are all visible. Concatenate full → upper → face, then append **one** copy of the first full-body frame (51 frames; pad only if you must hit 55). That assembled timeline is `$SOURCE_MP4` (`$RUN_DIR/*-source.mp4`).
 
 **Otherwise (Codex or shell-only):** invoke the local `grok` CLI so it loads `$imagine`, verifies `reference_to_video` / `image_to_video`, and produces the MP4:
@@ -91,7 +91,7 @@ grok --single "$PROMPT" --max-turns 8 --permission-mode auto --always-approve \
 
 If no Imagine video tool is available, report `IMAGE_TO_VIDEO_UNAVAILABLE` and stop. Never replace it with zoom, pan, scale, parallax, a slideshow, or another static-image fallback MP4/GIF.
 
-For Motion A, request one locked-camera, 1:1, 6-second source MP4. The generation prompt must name the supplied/edited image, every count of the step-touch choreography, two complete repetitions ending in the exact starting pose no later than 5.4 seconds, the protected 5.4–6.0-second tail, the #888888 background contract when it applies, and the exact output path. For Motion B, name the page still, the held photobook pose, the idle (breath / weight / blink as that shot requires), side wind, slow push-in that does not change shot class, stable original scene, and output path on each of the three calls. Do not rely on camera motion **alone** to simulate animation.
+For Motion A, request one locked-camera, 1:1, 6-second source MP4. The generation prompt must name the supplied/edited image, every count of the step-touch choreography, two complete repetitions ending in the exact starting pose no later than 5.4 seconds, the protected 5.4–6.0-second tail, the #888888 background contract when it applies, and the exact output path. For Motion B, name the page still, the held photobook pose, the idle (breath / weight / shoulder as that shot requires), eyes staying open, side wind, slow push-in that does not change shot class, stable original scene, and output path on each of the three calls. Do not rely on camera motion **alone** to simulate animation.
 
 ## Gate 1 — Approve the Source Before Converting
 
@@ -111,7 +111,7 @@ Reject a zero-byte, incomplete, static, or whole-frame-only scale/translation so
 
 **Motion A:** inspect enough intermediate frames to confirm two complete four-count cycles before 5.4 seconds: alternating left-right step-touches, soft knee bounces, matching hip shifts, shoulder-height outward/upward forearm pulses, the shoulder counter-roll, and the exact centred reset pose. The hands must remain inside the square and the feet must stay grounded without sliding. The frame at 5.4 seconds must match the first frame in foot placement, hip position, head angle, elbow bend, hand position, and motion follow-through; frames from 5.4 to 6.0 seconds must hold that pose without drift. Reject and regenerate a source with missing or uneven side changes, rigid arms, spins, jumps, travelling, abrupt snaps, or a visible loop jump.
 
-**Motion B:** Gate 1 each 6 s shot **before** trimming. Page pose holds. Original scene stays stable every frame. Mid-clip must show **idle** readable at square framing (breath / weight on shot 1; breath / shoulder or waist-hand on shot 2; blink or breath on shot 3), **wind** in hair/clothes, and a **slow push-in** that is tighter than frame 0 but does **not** change shot class (full body still shows feet; upper still crown-to-hips; face still includes hair). Reject a frozen painting, a full 回身 replayed on every shot, a walk-out, a pull-back, a whip of hair, a push-in so hard that shot 1 becomes MCU, or an ffmpeg zoom. Regenerate the failed shot; do not repair motion with ffmpeg.
+**Motion B:** Gate 1 each 6 s shot **before** trimming. Page pose holds. Original scene stays stable every frame. Eyes stay open on every shot. Mid-clip must show **idle** readable at square framing (breath / weight on shot 1; breath / shoulder or waist-hand on shot 2; breath on shot 3), **wind** in hair/clothes, and a **slow push-in** that is tighter than frame 0 but does **not** change shot class (full body still shows feet; upper still crown-to-hips; face still includes hair). Reject a frozen painting, a blink in a selected window, a full 回身 replayed on every shot, a walk-out, a pull-back, a whip of hair, a push-in so hard that shot 1 becomes MCU, or an ffmpeg zoom. If a clip blinks, choose a fully open-eye span or regenerate that shot; do not repair motion with ffmpeg.
 
 When the Motion A default background contract applies, Gate 1 must also confirm a **flat solid #888888 fill**, identical every frame. Reject any cyclorama or floor-to-wall seam, lighting gradient, source-scene remnant, text, logo, prop, cutout halo, colour spill, flickering gray tone, crawling texture, or unstable shadow. For Motion B, reject a scene that morphs, pops, or gets replaced by a flat gray fill the user did not ask for. Regenerate failures with `image_edit` followed by the video tool used for that contract; never repair motion or background failures with ffmpeg. If the MP4 does not materialize, allow one concise Grok continuation naming the image, output path, required tool, and verification; then report failure rather than falling back.
 
@@ -119,7 +119,7 @@ When the Motion A default background contract applies, Gate 1 must also confirm 
 
 Render a 240x240 GIF at 10 fps, 256 colours, infinite loop, and at most 5.5 seconds. This yields no more than 55 frames, within the RT100 Pro 56-frame limit.
 
-**Motion A:** the sampled frames normally run from 0.0 through 5.4 seconds, so the step-touch completes and holds its reset by 5.4 seconds. The remaining source tail is deliberately trimmed here.
+**Motion A:** the sampled frames normally run from 0.0 through 5.4 seconds, so the step-touch completes and holds its reset by 5.4 seconds. The remaining source tail is deliberately trimmed here. Do not run a loop-window search: the choreography is time-locked, and a pixel-best seam can drop a cycle. If the 0–5.5 s GIF jumps, regenerate the source so it resets at 5.4 s. Do not search Motion B. Do not search when the user asked to keep a supplied clip in full.
 
 ```zsh
 ffmpeg -hide_banner -loglevel error -t 5.5 -i "$SOURCE_MP4" \
@@ -147,7 +147,7 @@ ffprobe -v error -show_entries format=format_name,duration,size:stream=codec_nam
   -of default=noprint_wrappers=1 "$OUTPUT_GIF"
 ```
 
-Deliver only when the verifier passes, the file is GIF data, it is 240x240 with 56 or fewer frames and `loop=0`, its endpoint is visually clean, and the display-sized frames remain legible. The first-to-last transition must not jump.
+Deliver only when the verifier passes, the file is GIF data, it is 240x240 with 56 or fewer frames and `loop=0`, its endpoint is visually clean, and the display-sized frames remain legible. The loop check fails only when endpoint RGB MAE is **both** above **1.3×** median consecutive-frame MAE **and** above 12. A raw MAE above 12 alone is a warn. The first-to-last transition must not jump.
 
 **Motion A:** representative delivery frames must make the alternating step-touch, knee bounce, hip shift, shoulder-height forearm pulse, shoulder accent, and exact centred reset readable at display size.
 
