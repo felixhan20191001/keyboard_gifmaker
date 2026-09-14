@@ -62,7 +62,7 @@ If the user has not already named a motion, **stop and ask before any `image_edi
 
 1. **Recumbent come-hither** — one locked-camera 16:9 full-body shot; she lies across the wide screen and hooks an index finger toward the camera.
 2. **Three-shot recumbent editorial** — three hard-cut **landscape** photobook pages in a **supermodel recline**, still lying down: recumbent full-body cover, recumbent upper-body inner page, recumbent face close-up. Each shot holds its pose; hair and clothes blow in a side wind; every shot does a slow camera push-in.
-3. **Prone calf-swing / 趴卧摇腿** — one locked **side-camera** 16:9 full-body shot; she lies **prone on her stomach** on the ground; calves kick playfully back and forth; the upper body stays in **simple continuous motion** (forearm weight shift, slight head turn, tiny shoulder roll) then settles back — it must **not look frozen**; **facial expression changes**; hold the first-frame pose **0.4 s**, and **by 5.4 s** calves, arms, head, and hair are already back on that still and **hold until the last frame** so the clip loops.
+3. **Prone calf-swing / 趴卧摇腿** — one locked **side-camera** 16:9 full-body shot; she lies **prone on her stomach** on the ground; calves kick playfully back and forth; the upper body stays in **simple continuous motion** (forearm weight shift, slight head turn, tiny shoulder roll) — it must **not look frozen**; **facial expression changes**; seamless loop via the same still as first and last frame (no timed 5.4 s reset).
 
 Do not pick one silently. Do not start generating until they choose. Skip the question only when they already named one of these (勾手 / come-hither, or 回眸 / 三镜头 / glance / 写真, or 趴卧 / 摇腿 / 趴着 / prone / calf-swing), or gave a different explicit motion (that explicit motion still overrides all three).
 
@@ -103,7 +103,9 @@ Also make `*-curl.png` from `$FULLBODY_STILL`: **same recumbent framing and iden
 
 The recumbent full-body still is the **loop start and end**. Do not start the clip on a feet close-up.
 
-**Camera:** stay on the exact 16:9 recumbent full-body composition of `$FULLBODY_STILL` for the whole 6 s, including the **flat solid #888888 fill**. No zoom to the face, no pan that loses the feet, no standing the figure up, no bench / slab / board, no restoring the original scene. First frame matches last.
+**Loop (required on web Imagine):** use **`$FULLBODY_STILL` as both the start image and Add last frame** (exact same file). Do **not** require a timed return to the starting pose at 5.4 s or a protected hold tail — seamless looping comes from that first=last still.
+
+**Camera:** stay on the exact 16:9 recumbent full-body composition of `$FULLBODY_STILL` for the whole ~6 s, including the **flat solid #888888 fill**. No zoom to the face, no pan that loses the feet, no standing the figure up, no bench / slab / board, no restoring the original scene. First frame matches last.
 
 **Come-hither:** the raised hand stays at **collarbone-to-chest height**, palm toward the camera. Over the clip the **index finger curls inward** (match `*-curl.png`), then relaxes, **two or three times**. The other hand stays resting. Eyes stay **open** and look at the camera. Do not turn the gesture into a wave, a salute, or a point at the sky.
 
@@ -145,11 +147,11 @@ Do **not** use the A/B supermodel side-recline. Do **not** mix in the come-hithe
 
 **Legs:** the bent calves and boots kick **playfully back and forth** in a regular cute idle. The swing must be **visible at 320×172**. Hips stay on the floor. She does not crawl, sit up, stand, or dance.
 
-**Face:** expression **changes** mid-clip and is readable at 320×172 — a shifting smile, a playful beat — not a frozen mask. Eyes stay open (a brief mid-clip blink is allowed). By 5.4 s the face has returned to the first-frame look.
+**Face:** expression **changes** mid-clip and is readable at 320×172 — a shifting smile, a playful beat — not a frozen mask. Eyes stay open (a brief mid-clip blink is allowed). Do **not** require the face to return to the first-frame look by 5.4 s.
 
 **Upper body:** **simple continuous motion**, not a freeze and not a big pose change. Cycle: a forearm weight shift, a slight head turn, a tiny shoulder roll, then she settles back. Hands stay on the floor. The torso must **not look static** at 320×172. Stay prone.
 
-**Loop:** first frame and last frame are this same `$FULLBODY_STILL`. In the **source video**, hold the home pose **0.4 s** at the start; **by 5.4 s** calves, arms, head, and hair have already returned; hold through the MP4 last frame so Imagine actually loops. If that 6 s MP4 first/last already match, even-sample into the GIF (**≤51 frames**). If the **end hold is long**, drop extra still frames and keep a short home hold — duration follows what remains. Do not generate an open-ended clip. Do not fake the seam by copying the first frame onto the last or by fading.
+**Loop (required):** first frame and last frame are this same `$FULLBODY_STILL`. On **Grok web Imagine**, upload `$FULLBODY_STILL` as the start image **and** set **Add last frame** to the **exact same file**. Do **not** require a 0.4 s start hold or a timed return by 5.4 s — the native first=last still closes the loop. If that ~6 s MP4 first/last already match, even-sample into the GIF (**≤51 frames**). If the **end hold is long**, drop extra still frames and keep a short home hold — duration follows what remains. Do not generate an open-ended clip. Do not fake the seam by copying the first frame onto the last or by fading.
 
 For clearly adult characters, keep the mood playful and cute rather than come-hither. For childlike or age-ambiguous subjects, keep the same prone camera and calf-swing; keep the upper-body motion even smaller.
 
@@ -163,14 +165,14 @@ If the user supplies a usable MP4, use it as `$SOURCE_MP4` and start at Gate 1. 
 
 1. Resolve `$FULLBODY_STILL` as above. If the user image was not a 16:9 full-body still that matches the chosen contract, this **must** be the newly generated still, not the original crop.
 
-**Motion A:** Pixel-crop `*-face.png`. Always make `*-curl.png`. Call native **`reference_to_video`** (16:9, 6 s), not a face-only `image_to_video`:
+**Motion A:** Pixel-crop `*-face.png`. Always make `*-curl.png`. On **Grok web Imagine**, run one 16:9 ~6 s Video with Uploads of `$FULLBODY_STILL` (×2), face, curl as available (max ~3 named refs / uploads). Set **start image and Add last frame = the exact same `$FULLBODY_STILL`** for a native loop. (In Grok Build TUI, approximate with `reference_to_video` 16:9 6 s, not a face-only `image_to_video`.)
 
-- `<IMAGE_0>` = `$FULLBODY_STILL` (loop start / end; composition lock)
+- `<IMAGE_0>` = `$FULLBODY_STILL` (loop start / end; composition lock; **also Add last frame**)
 - `<IMAGE_1>` = `$FULLBODY_STILL` (identity, body, and full garment)
 - `<IMAGE_2>` = `*-face.png` (idle face)
 - `<IMAGE_3>` = `*-curl.png` (come-hither)
 
-The prompt must require: lock the camera on the exact recumbent full-body framing of `<IMAGE_0>` from first frame to last, including the **flat solid #888888 fill** (no bench, slab, or board; no cyclorama or lighting gradient); preserve the **exact garment coverage** in `<IMAGE_1>` (a hanging gown must stay a hanging gown, not a leotard, shorts, or bare-hip cut); the raised hand matches the come-hither cycle of `<IMAGE_3>` two or three times, then returns so the last frame matches the first; eyes stay open on the idle face of `<IMAGE_2>`; no staff in the beckon hand if it was removed. Copy the MP4 to `$RUN_DIR/*-source.mp4`.
+The prompt must require: lock the camera on the exact recumbent full-body framing of `<IMAGE_0>` from first frame to last, including the **flat solid #888888 fill** (no bench, slab, or board; no cyclorama or lighting gradient); preserve the **exact garment coverage** in `<IMAGE_1>` (a hanging gown must stay a hanging gown, not a leotard, shorts, or bare-hip cut); the raised hand matches the come-hither cycle of `<IMAGE_3>` two or three times; seamless loop closes on `<IMAGE_0>` (do **not** require a timed 5.4 s pose reset); eyes stay open on the idle face of `<IMAGE_2>`; no staff in the beckon hand if it was removed. Copy the MP4 to `$RUN_DIR/*-source.mp4`.
 
 **Motion B:** do not animate the original standing crop. After `$FULLBODY_STILL` (cover) and the inner still plus pixel-crops, one 6 s clip per page:
 
@@ -178,7 +180,7 @@ The prompt must require: lock the camera on the exact recumbent full-body framin
 2. The prompt must require: hold the exact recumbent pose of the still; a gentle continuous side wind on hair and clothes (no whip); a **slow gentle camera push-in** on the same axis as the face page; no pan, no sit-up, no stand-up, no pull-back; shot 1 keeps looking toward the feet and keeps the heels in frame; shot 2 keeps the gaze and the waist hand and stays crown-to-hips; shot 3 holds the gaze (one slow blink allowed mid-shot; eyes open at the end) and keeps hair in the top edge; keep the still's background stable every frame (do not replace it with #888888); eyes stay open except for that optional blink. Fall back to `image_to_video` if `reference_to_video` is unavailable.
 3. After Gate 1 on each clip, trim **16 + 17 + 17 frames** at 10 fps (1.6 s cover, 1.7 s inner, 1.7 s face) from the portion where wind and the push-in are both visible. **Shift the face window if needed so its last frame has eyes open**; do not keep a closed blink as the face tail. Concatenate full → upper → face, then append **one** copy of the first full-body frame (**51 frames**). That assembled timeline is `$SOURCE_MP4`.
 
-**Motion C:** do not animate a standing, seated, overhead, or A/B side-recline crop. After `$FULLBODY_STILL` is the approved prone side-view, call native **`image_to_video`** (16:9, 6 s) from that still. Use **`reference_to_video`** with the same still twice if you need a tighter identity lock. The prompt must require: lock the side camera on the exact full-body framing of `$FULLBODY_STILL` from first frame to last; she stays prone on the ground; calves kick playfully back and forth; **hold the exact starting pose for the first 0.4 s**; the upper body does **simple continuous motion** — a forearm weight shift, a slight head turn, a tiny shoulder roll — then settles back, and must **not look frozen**; **facial expression changes** mid-clip; **by 5.4 s** calves, arms, head, and hair have already returned to this exact starting picture, and she **holds it until the last frame** so first and last are this same still and the clip loops; no sit-up, crawl, stand, dance, zoom, or pan; eyes stay open. Copy the MP4 to `$RUN_DIR/*-source.mp4`. Do not run Motion A's loop-search trim on this clip.
+**Motion C:** do not animate a standing, seated, overhead, or A/B side-recline crop. After `$FULLBODY_STILL` is the approved prone side-view, on **Grok web Imagine** run one 16:9 ~6 s Video from that still with **start image and Add last frame = the exact same `$FULLBODY_STILL`**. (In Grok Build TUI, `image_to_video` / `reference_to_video` with the same still twice.) The prompt must require: lock the side camera on the exact full-body framing of `$FULLBODY_STILL` from first frame to last; she stays prone on the ground; calves kick playfully back and forth; the upper body does **simple continuous motion** — a forearm weight shift, a slight head turn, a tiny shoulder roll — and must **not look frozen**; **facial expression changes** mid-clip; seamless loop closes on `$FULLBODY_STILL` via Add last frame (do **not** require a 0.4 s start hold or a timed return by 5.4 s); no sit-up, crawl, stand, dance, zoom, or pan; eyes stay open. Copy the MP4 to `$RUN_DIR/*-source.mp4`. Do not run Motion A's loop-search trim on this clip.
 
 A face-only `image_to_video` call invents the unseen lower body and routinely changes garment type or proportions. Use it **only** if `reference_to_video` is unavailable. If you must fall back, the prompt still has to name every garment region from `$FULLBODY_STILL`, and Gate 1 must be stricter on outfit and body.
 
@@ -204,20 +206,25 @@ Require a nonzero, decodable MP4 with positive duration.
 ffprobe -v error -show_entries format=duration:stream=codec_name,width,height \
   -of default=noprint_wrappers=1 "$SOURCE_MP4"
 mkdir -p "$RUN_DIR/source-check"
-for t in 0 1.2 2.6 3.0 3.2 4.4 5.8; do
+DUR=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$SOURCE_MP4")
+for t in 0 1.2 2.6 3.0 3.2; do
   ffmpeg -hide_banner -loglevel error -ss "$t" -i "$SOURCE_MP4" \
     -frames:v 1 "$RUN_DIR/source-check/t${t}.png"
 done
+ffmpeg -hide_banner -loglevel error -ss "$(python3 -c "print(max(0, float('$DUR')*0.7))")" -i "$SOURCE_MP4" \
+  -frames:v 1 "$RUN_DIR/source-check/late-mid.png"
+ffmpeg -hide_banner -loglevel error -sseof -0.04 -i "$SOURCE_MP4" \
+  -frames:v 1 "$RUN_DIR/source-check/last.png"
 ```
 
-Reject a zero-byte, incomplete, static, or whole-frame-only scale/translation source. Stations must prove **locked full-body framing + curl timing + identity**.
+Reject a zero-byte, incomplete, static, or whole-frame-only scale/translation source. Stations must prove **locked full-body framing + curl timing + identity + native loop**.
 
 - **~0 s:** 16:9 **recumbent full body** lying **on the flat solid #888888 ground**, eyes open, beckon hand visible. Same crop as `$FULLBODY_STILL`. No bench, slab, or board.
 - **~1.2–3.2 s:** at least one clear **index-finger come-hither** (match `*-curl.png`). Hands not overhead. Garment **type and coverage** match `$FULLBODY_STILL`. Backdrop still flat solid #888888.
-- **~4.4 s:** still the same recumbent full body, idle or mid-cycle, no both-eyes-closed hold.
-- **~5.8 s:** back on the **same recumbent crop** as ~0 s.
+- **Late-mid:** still the same recumbent full body, idle or mid-cycle, no both-eyes-closed hold.
+- **Last frame:** matches `$FULLBODY_STILL` / first frame (Imagine Add last frame). Do **not** fail only because a mid timestamp is not yet on the home pose.
 
-Compare mid-clip frames to `$FULLBODY_STILL`, not only to each other. Reject and regenerate when the camera zooms to a chest-up that hides the legs, stands the figure up, shows the whole figure tiny in a wide empty frame, has no finger-curl, holds both eyes shut as the only face beat, snaps, changes garment class or coverage, slims or restyles the body, reintroduces a removed staff, puts the figure on a bench / slab / board, restores the original scene behind the figure, or fails to return to the starting pose.
+Compare mid-clip frames to `$FULLBODY_STILL`, not only to each other. Reject and regenerate when the camera zooms to a chest-up that hides the legs, stands the figure up, shows the whole figure tiny in a wide empty frame, has no finger-curl, holds both eyes shut as the only face beat, snaps, changes garment class or coverage, slims or restyles the body, reintroduces a removed staff, puts the figure on a bench / slab / board, restores the original scene behind the figure, or has a broken first/last loop seam.
 
 **Motion B:** Gate 1 each 6 s shot **before** trimming. Pose holds. Background stays the same as that shot's still; do not require #888888. Eyes open except one optional blink mid-shot on shot 3; the face clip must still contain open-eye frames at the end of the 1.7 s trim. Mid-clip must show **wind** in hair/clothes (shots 1–2 at least) and a **slow push-in** that is tighter than frame 0 but does **not** change shot class (full body still shows heels; upper still crown-to-hips; face still includes hair and neckline). Reject a frozen painting, a sit-up, a walk-out, a pull-back, a whip of hair, a push-in so hard that shot 1 becomes MCU, or an ffmpeg zoom. Regenerate the failed shot; do not repair motion with ffmpeg.
 
@@ -227,7 +234,7 @@ Compare mid-clip frames to `$FULLBODY_STILL`, not only to each other. Reject and
 ffprobe -v error -show_entries format=duration:stream=codec_name,width,height \
   -of default=noprint_wrappers=1 "$SOURCE_MP4"
 mkdir -p "$RUN_DIR/source-check"
-for t in 0 1.2 2.4 3.6 5.4 5.8; do
+for t in 0 1.2 2.4 3.6; do
   ffmpeg -hide_banner -loglevel error -ss "$t" -i "$SOURCE_MP4" \
     -frames:v 1 "$RUN_DIR/source-check/t${t}.png"
 done
@@ -235,10 +242,9 @@ ffmpeg -hide_banner -loglevel error -sseof -0.04 -i "$SOURCE_MP4" \
   -frames:v 1 "$RUN_DIR/source-check/last.png"
 ```
 
-- **~0 s and last frame:** same 16:9 **prone side-view full body** as `$FULLBODY_STILL`, calves lifted, same crop. Camera has not moved. Last frame matches the first-frame calf angle, arms, head, and hair.
+- **~0 s and last frame:** same 16:9 **prone side-view full body** as `$FULLBODY_STILL`, calves lifted, same crop. Camera has not moved. Last frame matches the first-frame calf angle, arms, head, and hair (Imagine Add last frame).
 - **Mid stations (~1.2–3.6 s):** calves at a **different swing angle** than frame 0; **visible upper-body motion** (forearm weight shift / slight head turn / tiny shoulder roll — the torso is **not frozen**); and a **changed expression** versus frame 0. She is still prone. Full body still in frame.
-- **~5.4 s:** already back on the start pose (calves, arms, head, hair). If 5.4 s is still mid-motion, reject and regenerate.
-- **~5.8 s:** still holding that start pose.
+- Do **not** require a timed return to the start pose by 5.4 s; only first and last must match the still.
 
 Reject a zoom, pan, sit-up, crawl, stand, dance, overhead camera, A/B side-recline, a frozen torso (only calves moving), or a last frame that does not match the still. Compare mid-clip frames to `$FULLBODY_STILL`, not only to each other. Regenerate a failed source; do not repair motion with ffmpeg.
 
@@ -252,7 +258,7 @@ Render a **320×172** landscape GIF, 256 colours, infinite loop, **≤51 frames*
 
 **Otherwise** (source is not a 6 s loop): 10 fps, **≤51 frames**. Duration follows the kept window.
 
-**Motion A:** if the 6 s source already loops (first≈last as above), use that even-sample path, then drop extra still tail if needed. If it does not loop, trim a **real motion segment** (prefer the **longest** window at **320×172** whose blurred endpoint MAE is ≤ 16 and whose seam is either ≤ **1.3×** median consecutive-frame MAE or ≤ 12 absolute RGB MAE), **≤51 frames** @ 10 fps. A 6 s source often matches at ~60 frames but fails a 51-frame trim; then use the script's **assemble** plan. Do not add fade crossfades or static fake animation. If neither a trim nor an assemble pair passes, regenerate the source — hold the start pose longer at both ends — rather than shipping a jump.
+**Motion A:** the source should already loop via Imagine Add last frame (first≈last). Prefer the even-sample path, then drop extra still tail if needed. If it does not loop, **regenerate** with the same `$FULLBODY_STILL` as start and last frame rather than relying on a pixel-best seam. A fallback trim/assemble via `search_rt85_loop.py` is allowed only as a last resort (prefer the **longest** window at **320×172** whose blurred endpoint MAE is ≤ 16 and whose seam is either ≤ **1.3×** median consecutive-frame MAE or ≤ 12 absolute RGB MAE), **≤51 frames** @ 10 fps. Do not add fade crossfades or static fake animation. Do **not** require a 5.4 s pose reset.
 
 ```zsh
 SEARCH=""
@@ -275,7 +281,7 @@ ffmpeg -hide_banner -loglevel error -i "$SOURCE_MP4" -ss "$START" -t "$DURATION"
 
 **Motion B:** do not run `search_rt85_loop.py` over one 6 s clip. From each approved shot, extract 10 fps **320×172** frames covering wind + push-in: **16** from full-body, **17** from upper, **17** from face (1.6 + 1.7 + 1.7 s). The **17th face frame must show eyes open**; if it is a blink, pick a different 1.7 s window. Concatenate full-body, then upper-body, then face, then **one** copy of the first full-body frame (**51 frames**). Palette-GIF that sequence (`loop=0`). Do not time-stretch with `setpts`. Hard cuts only. Never add the push-in in ffmpeg.
 
-**Motion C:** do not run `search_rt85_loop.py`. The 6 s source must already loop (Gate 1 last frame is home). Even-sample ≤51 frames from t=0 through the last source frame, scale/crop to 320×172, then **drop extra still frames at the end** if that hold is long — keep 1–2 home frames. Duration is whatever remains. Palette-GIF (`loop=0`). If first/last of the source do not match, regenerate the source; do not even-sample a jumping clip and do not copy the first frame onto the tail.
+**Motion C:** do not run `search_rt85_loop.py`. The ~6 s source must already loop (Gate 1 last frame is home via Add last frame). Even-sample ≤51 frames from t=0 through the last source frame, scale/crop to 320×172, then **drop extra still frames at the end** if that hold is long — keep 1–2 home frames. Duration is whatever remains. Palette-GIF (`loop=0`). If first/last of the source do not match, regenerate with the same still as start and last frame; do not even-sample a jumping clip and do not copy the first frame onto the tail. Do **not** require a timed 5.4 s reset.
 
 Prefer regenerating the source video when the loop visibly jumps. Do not depend on a fragile post-production crossfade.
 

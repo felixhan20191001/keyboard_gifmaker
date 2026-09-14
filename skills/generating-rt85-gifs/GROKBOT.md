@@ -6,9 +6,9 @@ Read **`../GROKBOT-BACKEND.md`** first, then this file, then `SKILL.md` for moti
 
 - Stills (`*-fullbody`, `*-face`, `*-curl`, Motion B inner crops): **Grok CLI** `image_edit` / `image_gen`.
 - Source MP4(s): **web Imagine** via Imagine出片 + plan file. Map:
-  - Motion A multi-ref → Video + uploads of `$FULLBODY_STILL` (×2), face, curl; prompt locks #888888 + come-hither cycle.
+  - Motion A multi-ref → Video + uploads of `$FULLBODY_STILL` (×2), face, curl; prompt locks #888888 + come-hither cycle. **Start image and Add last frame = the exact same `$FULLBODY_STILL`** (native loop). No timed 5.4 s pose-reset.
   - Motion B → three Video runs (cover / upper / face) then ffmpeg concat as in SKILL.md.
-  - Motion C → one Video from prone `$FULLBODY_STILL`.
+  - Motion C → one Video from prone `$FULLBODY_STILL`. **Start image and Add last frame = the exact same still** (native loop). No 0.4 s start hold / 5.4 s return requirement.
 - Never invent ffmpeg Ken Burns as a substitute.
 - Delivery still **320×172**; source compose **16:9**.
 
