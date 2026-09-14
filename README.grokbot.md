@@ -1,5 +1,7 @@
 # Keyboard GIF Maker — Grok Bot edition (`grokbot` branch)
 
+> **Policy (Felix):** `grokbot` is a **long-lived dedicated branch for Grok Bot**. **Do not merge it into `master`.** Keep Build/Codex work on `master`; push Grok Bot adaptations only here.
+
 This branch adapts the three keyboard GIF skills for **Grok Bot** agents.
 
 | Keyboard | Skill folder | Delivery |
@@ -23,10 +25,10 @@ Shared notes: `skills/GROKBOT-BACKEND.md`.
 
 ## Install into Grok Bot
 
-1. Keep this repo available (clone on Mac / box, or fetch via GitHub MCP).
-2. Copy or adapt each needed `SKILL.md` + `GROKBOT.md` + `scripts/` into a Grok Bot shared skill (`update_state` skill write), **or** instruct the agent to `Read` these paths from a local checkout.
+1. Keep this repo available (clone on Mac / box, or fetch via GitHub MCP from branch **`grokbot`**).
+2. Copy or adapt each needed `SKILL.md` + `GROKBOT.md` + `scripts/` into a Grok Bot shared skill (`update_state` skill write), **or** instruct the agent to `Read` these paths from a local checkout of **`grokbot`**.
 3. Ensure `ffmpeg` and `python3` exist on the machine that runs Gate scripts.
-4. Imagine out片 bot + `/workspace/imagine-pipeline/` must be available for video.
+4. Imagine出片 bot + `/workspace/imagine-pipeline/` must be available for video.
 
 ## Aspect vs Felix Imagine defaults
 
@@ -34,4 +36,4 @@ Felix’s Imagine pipeline defaults (9:16 / 10s / 480p) are **overridden** by ea
 
 ## Master branch
 
-`master` remains the Grok Build / Codex install (`~/.grok/skills/…`). Do not mix install paths.
+`master` remains the Grok Build / Codex install (`~/.grok/skills/…`). Do not mix install paths. Do not merge `grokbot` → `master`.
