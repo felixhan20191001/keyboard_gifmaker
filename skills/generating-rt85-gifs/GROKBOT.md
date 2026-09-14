@@ -14,7 +14,7 @@ Write these into the Imagine plan (`settings.aspect_ratio: 16:9`, `settings.dura
 
 ## Replace SKILL.md §2 (Produce the Source MP4)
 
-- Stills (`*-fullbody`, `*-face`, `*-curl`, Motion B inner crops): **Grok CLI** `image_edit` / `image_gen`.
+- Stills (`*-fullbody`, `*-face`, `*-curl`, Motion B inner crops): **GIFmaker 自出**（禁止 Grok Build）；reference 锁脸锁衣锁身材。
 - Source MP4(s): **web Imagine** via Imagine出片 + plan file (defaults above). Map:
   - Motion A multi-ref → Video + uploads of `$FULLBODY_STILL` (×2), face, curl; prompt locks #888888 + come-hither cycle. **`loop_via_image_menu: true`**；三点「循环」+ 可选 Add last frame 同 `$FULLBODY_STILL`。No timed 5.4 s pose-reset.
   - Motion B → three Video runs (cover / upper / face) then ffmpeg concat as in SKILL.md.
