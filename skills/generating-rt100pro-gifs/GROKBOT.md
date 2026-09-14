@@ -16,7 +16,7 @@ Write these into the Imagine plan (`settings.aspect_ratio: 1:1`, `settings.durat
 
 - Square stills / #888888 isolation: **Grok CLI** `image_edit` (pass still twice for 1:1).
 - Source MP4(s): **web Imagine** via Imagine出片 + plan file (defaults above).
-  - Motion A → one 1:1 Video from the square still. **Start image and Add last frame = the exact same still** (native loop). Prompt: energetic in-place K-pop dance, locked camera, #888888 when default bg applies. No 5.4 s pose-reset requirement.
+  - Motion A → one 1:1 Video from the square still. **`loop_via_image_menu: true`**；起始图三点菜单开「循环」；若有 Add last frame 再选同一静帧（双保险）。 Prompt: energetic in-place K-pop dance, locked camera, #888888 when default bg applies. No 5.4 s pose-reset requirement.
   - Motion B → three 1:1 Videos then trim/concat per SKILL.md.
 - Delivery GIF still **240×240**.
 

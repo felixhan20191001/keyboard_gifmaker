@@ -24,7 +24,7 @@ Do **not** rely on CLI `image_to_video` / `reference_to_video`.
    - `source_asset` / reference paths or `@Name` chips
    - `reuse_imagine_chat: true` unless refs changed or user asked for a new chat
    - `settings.aspect_ratio` / `duration` / `resolution` from **this skill** (not global 9:16 defaults unless they match). Package defaults: **RT100 Pro** → `1:1` / `6s` / `480p`; **RT85** → `16:9` / `6s` / `480p`
-   - For **RT100 Pro Motion A**, **RT85 Motion A**, **RT85 Motion C** (and any other contract that needs a native loop): set **Add last frame** to the **same still** as the start image; document that in the plan (`last_frame` / `workflow_note` / `settings.other`)
+   - For **RT100 Pro Motion A**, **RT85 Motion A**, **RT85 Motion C** (native loop only): set `loop_via_image_menu: true` and `last_frame: <same still as start>`. Imagine出片 **must** open the upload thumbnail 三点菜单「循环」, and if Add last frame is still shown, set it to that same still (belt-and-suspenders). See `/workspace/imagine-pipeline/loop-via-image-menu.md`. Do **not** enable 循环 for Motion B or when the plan omits the flag.
    - `final_prompt`
    - `return_to` / `deliver_mp4` / `deliver_mp4_to` when handing back to GIFmaker
    - `handoff_to: Imagine出片`

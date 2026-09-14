@@ -16,9 +16,9 @@ Write these into the Imagine plan (`settings.aspect_ratio: 16:9`, `settings.dura
 
 - Stills (`*-fullbody`, `*-face`, `*-curl`, Motion B inner crops): **Grok CLI** `image_edit` / `image_gen`.
 - Source MP4(s): **web Imagine** via Imagine出片 + plan file (defaults above). Map:
-  - Motion A multi-ref → Video + uploads of `$FULLBODY_STILL` (×2), face, curl; prompt locks #888888 + come-hither cycle. **Start image and Add last frame = the exact same `$FULLBODY_STILL`** (native loop). No timed 5.4 s pose-reset.
+  - Motion A multi-ref → Video + uploads of `$FULLBODY_STILL` (×2), face, curl; prompt locks #888888 + come-hither cycle. **`loop_via_image_menu: true`**；三点「循环」+ 可选 Add last frame 同 `$FULLBODY_STILL`。No timed 5.4 s pose-reset.
   - Motion B → three Video runs (cover / upper / face) then ffmpeg concat as in SKILL.md.
-  - Motion C → one Video from prone `$FULLBODY_STILL`. **Start image and Add last frame = the exact same still** (native loop). No 0.4 s start hold / 5.4 s return requirement.
+  - Motion C → one Video from prone `$FULLBODY_STILL`. **`loop_via_image_menu: true`**；三点「循环」+ 可选 Add last frame 同静帧。No 0.4 s start hold / 5.4 s return requirement.
 - Never invent ffmpeg Ken Burns as a substitute.
 - Delivery GIF still **320×172**; source compose **16:9**.
 
