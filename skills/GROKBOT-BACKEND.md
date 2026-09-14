@@ -24,8 +24,9 @@ Do **not** rely on CLI `image_to_video` / `reference_to_video`.
    - `source_asset` / reference paths or `@Name` chips
    - `reuse_imagine_chat: true` unless refs changed or user asked for a new chat
    - `settings.aspect_ratio` / `duration` / `resolution` from **this skill** (not global 9:16 defaults unless they match)
+   - For **RT100 Pro Motion A** (and any other contract that needs a native loop): set **Add last frame** to the **same still** as the start image; document that in the plan (`last_frame` / `workflow_note` / `settings.other`)
    - `final_prompt`
-   - `notify_only: true` (tell user 「生成好了」; they check Grok App)
+   - `return_to` / `deliver_mp4` / `deliver_mp4_to` when handing back to GIFmaker
    - `handoff_to: Imagine出片`
 3. Message **Imagine出片** with the plan path; wait for completion; copy/download MP4 into `$RUN_DIR/*-source.mp4` (or the per-shot paths Motion B needs).
 4. Continue Gate 1 → GIF → Gate 2 → cleanup from `SKILL.md`.

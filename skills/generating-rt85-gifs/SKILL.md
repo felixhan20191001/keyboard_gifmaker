@@ -56,7 +56,7 @@ Inspect the supplied image or video. If neither is supplied, ask for one. Create
 
 ### Choose a motion contract (required)
 
-This skill has **three default motion contracts**. They are separate. Never mix them in one clip. Never use the RT100 Pro standing step-touch or standing 回身 here.
+This skill has **three default motion contracts**. They are separate. Never mix them in one clip. Never use the RT100 Pro standing K-pop dance or standing 回身 here.
 
 If the user has not already named a motion, **stop and ask before any `image_edit` or video call**. Present exactly these three options, in the user's language, and wait:
 

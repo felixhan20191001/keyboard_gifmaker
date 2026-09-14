@@ -37,3 +37,7 @@ Felix’s Imagine pipeline defaults (9:16 / 10s / 480p) are **overridden** by ea
 ## Master branch
 
 `master` remains the Grok Build / Codex install (`~/.grok/skills/…`). Do not mix install paths. Do not merge `grokbot` → `master`.
+
+## Delivery
+
+See `skills/GROKBOT-DELIVERY.md` (DM GIF for approval; delete cloud files only after pass + local save confirmed).
