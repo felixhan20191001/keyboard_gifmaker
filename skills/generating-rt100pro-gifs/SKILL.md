@@ -12,6 +12,10 @@ description: >
 
 For every RT100 Pro request, follow this fixed pipeline in order: **ask which motion contract to use** (unless already named), prepare the reference, make or accept a real MP4, approve the source animation, render the GIF, approve the delivery file, then perform mandatory post-delivery cleanup. The user may override motion, framing, duration, or mood, but never the source-video and final-file quality gates or the final cleanup requirement.
 
+### Source MP4 / Imagine defaults
+
+Unless the user overrides: aspect **1:1** Square, resolution **480p**, duration **6s**. Delivery GIF remains **240×240**.
+
 ## 1. Prepare the Reference and Motion
 
 ### Run folder (required)

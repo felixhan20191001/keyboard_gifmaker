@@ -2,15 +2,25 @@
 
 Read **`../GROKBOT-BACKEND.md`** first, then this file, then `SKILL.md` for motion contracts / gates / cleanup.
 
+## Imagine video defaults (required unless user overrides)
+
+| Setting | Default |
+|---------|---------|
+| Aspect | **16:9** Widescreen (横向) |
+| Resolution | **480p** |
+| Duration | **6s** |
+
+Write these into the Imagine plan (`settings.aspect_ratio: 16:9`, `settings.duration: 6s`, `settings.resolution: 480p`). Do not use the pipeline’s global 9:16 / 10s defaults.
+
 ## Replace SKILL.md §2 (Produce the Source MP4)
 
 - Stills (`*-fullbody`, `*-face`, `*-curl`, Motion B inner crops): **Grok CLI** `image_edit` / `image_gen`.
-- Source MP4(s): **web Imagine** via Imagine出片 + plan file. Map:
+- Source MP4(s): **web Imagine** via Imagine出片 + plan file (defaults above). Map:
   - Motion A multi-ref → Video + uploads of `$FULLBODY_STILL` (×2), face, curl; prompt locks #888888 + come-hither cycle. **Start image and Add last frame = the exact same `$FULLBODY_STILL`** (native loop). No timed 5.4 s pose-reset.
   - Motion B → three Video runs (cover / upper / face) then ffmpeg concat as in SKILL.md.
   - Motion C → one Video from prone `$FULLBODY_STILL`. **Start image and Add last frame = the exact same still** (native loop). No 0.4 s start hold / 5.4 s return requirement.
 - Never invent ffmpeg Ken Burns as a substitute.
-- Delivery still **320×172**; source compose **16:9**.
+- Delivery GIF still **320×172**; source compose **16:9**.
 
 ## Script paths
 

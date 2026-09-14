@@ -38,6 +38,8 @@ EPOMAKER does **not** publish an official public pixel table for the RT85 GIF cr
 | Colors | **256** palette GIF | `palettegen` + `sierra2_4a` |
 | Soft size ceiling | **~2.5 MB** | Shrink if the driver rejects upload |
 
+**Source MP4 (Grok web Imagine) defaults:** aspect **16:9** Widescreen, resolution **480p**, duration **6s**. Override only if the user asks.
+
 **Do not** use the RT100 Pro square `240×240` defaults for RT85.  
 **Do not** deliver portrait `172×320` unless the user or driver explicitly requires it.  
 **Do not** copy the RT100 Pro **standing** three-shot 回身 onto this panel — a standing figure is tiny in 320×172. RT85 three-shot stays **recumbent** and **landscape**.
