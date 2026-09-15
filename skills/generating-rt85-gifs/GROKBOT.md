@@ -1,3 +1,5 @@
+**Outfit lock:** 服装须与原参考图高度一致。
+
 # Grok Bot override — generating-rt85-gifs
 
 Read **`../GROKBOT-BACKEND.md`** first, then this file, then `SKILL.md` for motion contracts / gates / cleanup.
