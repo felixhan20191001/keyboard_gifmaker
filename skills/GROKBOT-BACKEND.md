@@ -15,7 +15,7 @@ grok -p "$PROMPT" --always-approve --max-turns 12
 
 Save outputs under `$RUN_DIR`. Reject and regenerate on identity drift before any video handoff.
 
-**Outfit lock (hard rule):** clothing must stay **highly consistent** with the character reference (same type/cut/colors/embroidery/jewelry). Fail self-check and re-edit on outfit drift. Pass character-ref **twice**.
+**Outfit lock (hard rule):** clothing must stay **highly consistent** with the **user-uploaded character/outfit reference** (Felix attaches each run) — same type/cut/colors/embroidery/jewelry. **Not** the skill pose-ref. Fail self-check and re-edit on outfit drift. Pass that uploaded character-ref **twice**.
 
 **Skirt / gown coverage (hard rule):** **Only if** the outfit has a skirt/gown/dress — then fabric must **cover the thighs** and **never show underwear**. Non-skirt outfits (pants, shorts, bodysuit, bikini, etc.) **ignore** this rule. Fail self-check and re-edit skirted stills if panties/briefs or hiked-skirt crotch are visible.
 

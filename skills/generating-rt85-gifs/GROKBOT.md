@@ -1,4 +1,4 @@
-**Outfit lock:** 服装须与原参考图高度一致。
+**Outfit lock:** 服装须与**用户每次上传的角色／服装参考图**高度一致（不是技能 pose-ref）。
 
 # Grok Bot override — generating-rt85-gifs
 
