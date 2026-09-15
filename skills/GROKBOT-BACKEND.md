@@ -15,7 +15,7 @@ grok -p "$PROMPT" --always-approve --max-turns 12
 
 Save outputs under `$RUN_DIR`. Reject and regenerate on identity drift before any video handoff.
 
-**Skirt / gown coverage (hard rule):** skirts and dresses must **cover the thighs**; **never show underwear**. Fail self-check and re-edit if panties/briefs or hiked-skirt crotch are visible.
+**Skirt / gown coverage (hard rule):** **Only if** the outfit has a skirt/gown/dress — then fabric must **cover the thighs** and **never show underwear**. Non-skirt outfits (pants, shorts, bodysuit, bikini, etc.) **ignore** this rule. Fail self-check and re-edit skirted stills if panties/briefs or hiked-skirt crotch are visible.
 
 **Self-check loop (Felix 2026-09-15):** after every `image_edit` / `image_gen`, Grok Build must inspect the result against the stated checklist (identity, outfit, pose, coverage, etc.). If anything fails, **automatically edit again in the same session**. **Hard cap: at most 5 edit rounds per still job** (including the first generate). If still failing after 5, stop and deliver the best candidate + honest gaps — do not keep looping. Do **not** wait for GIFmaker/Felix to review intermediates. **GIFmaker must not mid-check or steer edits** — only receive Grok Build’s final still (after ≤5 self-check rounds) and hand that to the user. Progress status to the user is OK.
 
