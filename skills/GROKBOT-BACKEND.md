@@ -2,17 +2,20 @@
 
 Applies to all three keyboard packages on the `grokbot` branch.
 
-## 1. Stills (优先自出；失败则 Grok Build 兜底)
+## 1. Stills (**默认 Grok Build**)
 
-**Primary:** GIFmaker generates stills itself (Cursor `GenerateImage`) with:
+**Primary (Felix 2026-09-15):** use Grok Build CLI (`grok -p` + native `image_edit` / `image_gen`) with:
 
-- `reference_image_paths` pointing at the user reference (and edited masters as needed)
-- the required aspect (`1:1` / `16:9` / `9:16`)
+- character (and pose) references attached; pass the character reference **twice** when a specific aspect (`1:1` / `16:9` / `9:16`) must be honored
 - prompts that **hard-lock identity**: same face, hair, body type, outfit, accessories as the reference — no restyle, no slim/enlarge, no new character
+
+```bash
+grok -p "$PROMPT" --always-approve --max-turns 12
+```
 
 Save outputs under `$RUN_DIR`. Reject and regenerate on identity drift before any video handoff.
 
-**Fallback:** if `GenerateImage` fails, use Grok Build CLI (`grok -p` + native `image_edit` / `image_gen`), pass the reference twice for the required aspect, keep hard identity lock.
+**Optional:** Cursor `GenerateImage` only if Felix explicitly asks for it — not the default path.
 
 ## 2. Video (Grok web Imagine)
 
