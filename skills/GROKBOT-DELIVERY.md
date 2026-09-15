@@ -8,17 +8,29 @@ Applies to GIFmaker runs on the `grokbot` branch.
 2. Ask whether it **passes**.
 3. **Remind him**: if it passes, **save the file to his local computer first**, then reply e.g. `通过，已存本地`.
 
-## Delete everything on the box for that run (dual confirmation)
+## Delete everything on the box for that run (dual confirmation — Felix 2026-09-15)
 
-“Cloud artifacts” means **all intermediates and finals of this generation on the box computer**, not a separate archive label.
+“Cloud artifacts” means **all intermediates, temps, and working copies of this generation on the box**, not a separate archive label.
 
-Only after he says **passed** **and** **already saved locally**, delete:
+**Still dual confirmation:** only after he **passes review** **and** confirms **already saved locally** (e.g. `通过，已存本地` / `我保存了`), then delete. Never delete on pass alone or save alone.
 
-- the entire `$RUN_DIR` (stills, checks, source MP4s, final GIF, leftover scripts output)
+Delete **everything for that run**, including:
+
+- the entire `$RUN_DIR` (stills, face/curl crops, gate frames, checks, source MP4s, final GIF, leftover script output, pick-rounds, logs, prompts)
+- **his uploaded character/outfit reference** copies for that run (chat-materialized refs under the run dir / refs folder — not skill pose-refs)
 - matching files under `/workspace/imagine-pipeline/outputs/gifmaker/`
-- any other files created for that run (plans copies, inbox drops, etc.)
+- that run’s `imagine-pipeline/refs/…` and plan copies under `imagine-pipeline/plans/`
+- keyboard_gifmaker `output/<keyboard>/<中文名>/` working copies for that piece
+- curl / litterbox download caches, `/tmp` crops, and Grok Build session images for that workdir when they belong to this run
+- any other files created only for that run (inbox drops, etc.)
 
-Until then, keep them. If he rejects, revise; do not wipe the last candidate until a replacement is approved or he orders cleanup.
+**Do not** delete:
+
+- other runs’ folders or outputs
+- repo skill assets (e.g. `skills/.../refs/motion-a-recline-pose-ref.png` and other packaged pose refs)
+- unrelated characters’ outputs
+
+Until dual confirmation, keep them. If he rejects, revise; do not wipe the last candidate until a replacement is approved or he orders cleanup.
 
 ## Same Imagine chat when re-rolling video
 
