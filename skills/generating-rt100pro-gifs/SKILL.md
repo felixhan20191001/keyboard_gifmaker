@@ -3,20 +3,20 @@ name: generating-rt100pro-gifs
 description: >
   Create, animate, convert, or optimize a GIF for the EPOMAKER RT100 Pro keyboard
   screen from a reference image or video. Use for keyboard mini-screen GIFs,
-  Grok Build `reference_to_video` (native loop via first_frame=last_frame), assembled Motion B loops unchanged
-  MP4s, three-shot editorial GIFs, 240x240 delivery GIFs, RT100 Pro upload-ready
+  Grok Build `reference_to_video` (native loop via first_frame=last_frame),
+  assembled Motion B loops, three-shot editorial GIFs, 240x240 delivery GIFs, RT100 Pro upload-ready
   media, or when the user runs /generating-rt100pro-gifs.
 ---
 
 # Generating RT100 Pro GIFs
 
-For every RT100 Pro request, follow this fixed pipeline in order: **ask which motion contract to use** (unless already named), prepare the reference, make or accept a real MP4, approve the source animation, render the GIF, approve the delivery file, then perform mandatory post-delivery cleanup. The user may override motion, framing, duration, or mood, but never the source-video and final-file quality gates or the final cleanup requirement.
+For every RT100 Pro request, follow this fixed pipeline in order: **ask which motion contract to use** (unless already named, **or the user sent a looping MP4 to convert**), prepare the reference, make or accept a real MP4, approve the source animation, render the GIF, approve the delivery file, then perform mandatory post-delivery cleanup. The user may override motion, framing, duration, or mood, but never the source-video and final-file quality gates or the final cleanup requirement. **Convert-only exception:** a user-supplied looping MP4 skips the motion question, Imagine, and Identity-lock stills — encode with the looping-source even-sample path.
 
 ## 1. Prepare the Reference and Motion
 
 ### Run folder (required)
 
-Each GIF product lives in its own subdirectory: `output/rt100pro/<中文名>/`. Name the folder in **Chinese**, short, no spaces. Prefer the character name from the user's file or message (example: `阿卡丽_蓝焰半身_072.jpg` → `阿卡丽蓝焰`). If the user gives a name, use that. One folder per GIF product. Do not write a new GIF into another product's folder. If the same character is generated again, add a short distinguisher (`阿卡丽蓝焰-踏步`, `阿卡丽蓝焰-2`). Do not write deliverables into `output/rt100pro/` root. `$RUN_DIR` = `output/rt100pro/<中文名>/`. Intermediates and finals for that run go only there. Cleanup must not touch sibling folders.
+Each GIF product lives in its own subdirectory: `output/rt100pro/<中文名>/`. Name the folder in **Chinese**, short, no spaces. Prefer the character name from the user's file or message (example: `阿卡丽_蓝焰半身_072.jpg` → `阿卡丽蓝焰`). If the user gives a name, use that. One folder per GIF product. Do not write a new GIF into another product's folder. If the same character is generated again, add a short distinguisher (`阿卡丽蓝焰-踏步`, `阿卡丽蓝焰-2`). Do not write **generated** deliverables into `output/rt100pro/` root. `$RUN_DIR` = `output/rt100pro/<中文名>/`. Intermediates and finals for that run go only there. Cleanup must not touch sibling folders. **Convert-only** of a user-supplied looping MP4 writes `<中文名>-rt100pro.gif` into `output/rt100pro/` root (no per-video subfolder) unless the user asks for a folder.
 
 Inspect the supplied image or video. If neither is supplied, ask for one. Create `$RUN_DIR` first. Keep all intermediates and final files in `$RUN_DIR`; name editorial cover/inner stills `*-cover` / `*-inner`, square face stills `*-face`, Motion B per-shot clips `*-cover.mp4` / `*-upper.mp4` / `*-face.mp4`, the assembled source `*-source.mp4`, and the final `*-rt100pro.gif`.
 
@@ -29,9 +29,19 @@ If the user has not already named a motion, **stop and ask before any `image_edi
 1. **Step-touch dance** — one locked-camera square framing; compact four-count left-right step-touch loop.
 2. **Three-shot editorial** — three hard-cut square photobook pages, standing: full-body cover, upper-body inner page, face close-up. Each shot holds its page pose with readable idle (breath, weight, hair/clothes) and a slow camera push-in.
 
-Do not pick one silently. Do not start generating until they choose. Skip the question only when they already named one of these, or gave a different explicit motion (that explicit motion still overrides both).
+Do not pick one silently. Do not start generating until they choose. Skip the question when they already named one of these, gave a different explicit motion (that explicit motion still overrides both), **or sent a looping MP4 / folder of looping MP4s to convert to GIF**.
 
-Shared rules for both contracts: preserve identity, anatomy, outfit, and mood; tasteful confident energy for clearly adult characters, playful/cute only for childlike or age-ambiguous subjects; keep every hand and limb inside the square; no spins, jumps, travelling steps, or overhead arms unless the user asked. Hair, clothing, cape, jewelry, wings, tails, flames, or particles follow the body with physically plausible lag. Motion A keeps a locked camera. Motion B requires a **native slow push-in** on every shot; ffmpeg zoom, pan, scale, Ken Burns, and parallax stay forbidden. Do not fake animation with camera motion alone.
+### Identity lock (required)
+
+The figure in every generated still and video must stay **highly consistent** with the **user's original reference**. This is strictest on the **first-frame still** (Motion A square reference, Motion B cover/inner masters): crop and pose may change to the contract, but it must still be **that same person in that same drawing style**.
+
+Lock these from the original: face shape, eyes (color, shape), hair (color, length, style, ornaments), body type, outfit (cut, colors, materials, accessories), and **medium** (2D painterly / anime illustration stays 2D; do not convert to photoreal 3D or CGI, and vice versa).
+
+When `image_edit` creates that still: pass the reference **twice**; name those locked traits in the prompt. Then **compare the still side by side with the original reference**. Reject and redo if the face, hair, eyes, outfit, body type, or style drifted — including a prettier face, different eye color, restyled hair, slimmer body, or a photoreal restyle of an illustration.
+
+Do not invent a similar character. Video frames must keep this locked identity.
+
+Shared rules for both contracts: follow Identity lock; tasteful confident energy for clearly adult characters, playful/cute only for childlike or age-ambiguous subjects; keep every hand and limb inside the square; no spins, jumps, travelling steps, or overhead arms unless the user asked. Hair, clothing, cape, jewelry, wings, tails, flames, or particles follow the body with physically plausible lag. Motion A keeps a locked camera. Motion B requires a **native slow push-in** on every shot; ffmpeg zoom, pan, scale, Ken Burns, and parallax stay forbidden. Do not fake animation with camera motion alone.
 
 **Motion A background:** unless the user explicitly requests a different setting, remove the original background before animation and place the isolated subject on a **flat solid #888888 fill**. Same hex everywhere — no cyclorama, no floor-to-wall seam, no lighting falloff, no texture. The finished Motion A reference and video must contain no recognizable source-scene objects, source text, logos, props, cutout halos, colour spill, background texture crawling, or lighting flicker. Keep the #888888 fill identical every frame for the whole loop.
 
@@ -69,7 +79,7 @@ Because a face close-up cannot match a full-body first frame, **bookend the asse
 
 ## 2. Produce the Source MP4 through Local Grok Imagine
 
-If the user supplies a usable MP4, use it as `$SOURCE_MP4` and start at Gate 1. Otherwise generate a real animated source with Imagine. Do not substitute a nonexistent `imagine-video` command or a still-image animation.
+If the user supplies a usable MP4, use it as `$SOURCE_MP4` and start at Gate 1. **If that MP4 already loops, skip Imagine and encode with the looping-source even-sample path.** Otherwise generate a real animated source with Imagine. Do not substitute a nonexistent `imagine-video` command or a still-image animation.
 
 **Preferred in a Grok Build / Grok TUI session:** call the native video tool directly. For Motion A when the default background contract applies, always use `image_edit` first—even for an already-square input—to isolate the subject, remove the source background, and create the square flat solid #888888 reference. Pass the still **twice** when requesting `1:1` so the aspect is honored. For Motion B, square the page stills without replacing the original scene.
 
@@ -117,12 +127,27 @@ When the Motion A default background contract applies, Gate 1 must also confirm 
 
 ## 3. Render the RT100 Pro GIF
 
-Render a 240x240 GIF at 10 fps, 256 colours, infinite loop, and at most 5.5 seconds. This yields no more than 55 frames, within the RT100 Pro 56-frame limit.
+Render a 240x240 GIF, 256 colours, infinite loop, **≤55 frames** (verifier max 56).
 
-**Motion A (even-sample):** regardless of source duration, **uniformly** sample into **≤55 frames** (RT100 Pro budget) — do **not** irregularly skip frames and do **not** run a pixel-best loop-window search as the primary path. If the GIF loop jumps, regenerate the source with `first_frame`=`last_frame`=the square still. Do not search Motion B. Do not search when the user asked to keep a supplied clip in full.
+### Looping source — even-sample (required)
+
+Use this whenever `$SOURCE_MP4` already loops (Gate 2: endpoint MAE is not both above 12 and above 1.3× step MAE), including a **user-supplied looping MP4**. Do **not** use `-t 5.5` on that clip — it drops the looping last frame.
+
+- If the user sent mixed videos and did not name a device: **1:1 → RT100 Pro**; 16:9 / widescreen → RT85; 9:16 / portrait → QK100.
+- Even-sample from source **frame 0 through the last frame**. GIF first = source first; GIF last = source last. Indices: `round(i * (N-1) / (n-1))` for `i = 0..n-1`.
+- `n = min(55, N, max(2, round(duration_seconds * 10)))`. **Never** more than 55 frames (verifier max 56). If duration × 10 would exceed 55, even-sample 55 across the whole clip (plays slightly faster).
+- Do **not** use `fps=10` (from 24 fps it drops 2-2-3 and can miss the last frame).
+- Scale only: `scale=240:240:flags=lanczos`. Do not crop. Do not pad/letterbox.
+- Every frame delay **100 ms**. Palette 256 + `sierra2_4a`, `loop=0`. Do not copy the first frame onto the last.
+- User-supplied convert: write `output/rt100pro/<中文名>-rt100pro.gif` at the model-folder **root** (short Chinese name, no spaces, no per-video subfolder) unless the user asks for a folder.
+
+**Motion A (even-sample):** regardless of source duration, **uniformly** sample into **≤55 frames** (RT100 Pro budget) using the looping-source even-sample path — do **not** irregularly skip frames, do **not** use `-t 5.5` as the primary path, and do **not** run a pixel-best loop-window search as the primary path. If the GIF loop jumps, regenerate the source with `first_frame`=`last_frame`=the square still. Do not search Motion B. Do not search when the user asked to keep a supplied clip in full.
+
+Looping convert and Motion A native-loop GIFs **must** use the index formula above (`round(i * (N-1) / (n-1))`), not `fps=10` and not `-t 5.5`. An ffmpeg `fps=` filter is not the required path — it can miss the last frame.
 
 ```zsh
-# Even-sample the FULL clip into ≤55 frames (example: fps≈min(10, 55/DUR); do not -t 5.5 trim as the primary path)
+# Illustration only (approximate cadence). Preferred: extract the even-sample
+# indices, scale each selected frame to 240x240, then palette-GIF. Never -t 5.5.
 DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$SOURCE_MP4")
 FPS=$(python3 -c "d=float('$DUR'); print(min(10, 55/d) if d>0 else 10)")
 ffmpeg -hide_banner -loglevel error -i "$SOURCE_MP4" \
@@ -161,6 +186,8 @@ When the Motion A default background applies, also confirm that the #888888 fill
 ## 4. Mandatory Post-Delivery Cleanup
 
 After Gate 2 passes, clean up the current run before reporting completion.
+
+**Convert-only** of a user-supplied looping MP4: keep `output/rt100pro/<中文名>-rt100pro.gif`. Do not copy the user's original into the output folder unless they asked.
 
 **Motion A — keep two files** in `$RUN_DIR`:
 

@@ -11,7 +11,7 @@ description: >
 
 # Generating RT85 GIFs
 
-For every RT85 request, follow this fixed pipeline in order: **ask which motion contract to use** (unless already named); inspect the supplied still; **if it is not a 16:9 still that matches the chosen contract, first generate that still** (Motion A: match pose-ref mid-recline crop, not necessarily full-body — **no background requirement**; Motion B/C still need full-body for their contracts); prepare the stills for the chosen contract; make or accept a real landscape MP4; approve the source animation, render the GIF, approve the delivery file, then perform mandatory post-delivery cleanup. The user may override motion, framing, duration, mood, or background, but never the source-video and final-file quality gates or the final cleanup requirement.
+For every RT85 request, follow this fixed pipeline in order: **ask which motion contract to use** (unless already named, **or the user sent a looping MP4 to convert**); inspect the supplied still; **if it is not a 16:9 still that matches the chosen contract, first generate that still** (Motion A: match pose-ref mid-recline crop, not necessarily full-body — **no background requirement**; Motion B/C still need full-body for their contracts); prepare the stills for the chosen contract; make or accept a real landscape MP4; approve the source animation, render the GIF, approve the delivery file, then perform mandatory post-delivery cleanup. The user may override motion, framing, duration, mood, or background, but never the source-video and final-file quality gates or the final cleanup requirement. **Convert-only exception:** a user-supplied looping MP4 skips the motion question, Imagine, Identity-lock stills, and background restyle — encode with the looping-source even-sample path.
 
 ## Product facts (researched)
 
@@ -31,7 +31,7 @@ EPOMAKER does **not** publish an official public pixel table for the RT85 GIF cr
 |-----------|---------|--------|
 | Resolution | **320×172** (W×H) | **Landscape rectangle**, not square |
 | Aspect | **≈16:9** (exact 320:172 ≈ 1.86:1) | Compose for wide screen; closest Imagine aspect **16:9** |
-| Frame rate | **10 fps** (100 ms/frame) | Looping 6 s source: even-sample, ~8.5 fps; delays 100–120 ms |
+| Frame rate | **10 fps** (100 ms/frame) | Looping source: even-sample (not `fps=10`); delays 100–120 ms |
 | Max frames | **51** | **Hard cap.** Never deliver more |
 | Duration | **dynamic** | Follow the kept window. Do not force 6.0 s or 5.1 s |
 | Loop | **infinite** (`loop=0`) | Required |
@@ -48,7 +48,7 @@ Keep RT85 work in `output/rt85/` and RT100 Pro work in `output/rt100pro/`.
 
 ### Run folder (required)
 
-Each generation lives in its own subdirectory: `output/rt85/<中文名>/`. Name the folder in **Chinese**, short, no spaces. Prefer the character name from the user's file or message (example: `阿卡丽_蓝焰半身_072.jpg` → `阿卡丽蓝焰`). If the user gives a name, use that. One folder per character; re-renders of the same character reuse that folder so Motion B shot clips stay findable. Do not write deliverables into `output/rt85/` root. Do not mix two characters in one folder. `$RUN_DIR` = `output/rt85/<中文名>/`. Intermediates and finals for that run go only there. Cleanup must not touch sibling folders.
+Each generation lives in its own subdirectory: `output/rt85/<中文名>/`. Name the folder in **Chinese**, short, no spaces. Prefer the character name from the user's file or message (example: `阿卡丽_蓝焰半身_072.jpg` → `阿卡丽蓝焰`). If the user gives a name, use that. One folder per character; re-renders of the same character reuse that folder so Motion B shot clips stay findable. Do not write **generated** deliverables into `output/rt85/` root. Do not mix two characters in one folder. `$RUN_DIR` = `output/rt85/<中文名>/`. Intermediates and finals for that run go only there. Cleanup must not touch sibling folders. **Convert-only** of a user-supplied looping MP4 writes `<中文名>-rt85.gif` into `output/rt85/` root (no per-video subfolder) unless the user asks for a folder.
 
 ## 1. Prepare the Reference and Motion
 
@@ -64,11 +64,21 @@ If the user has not already named a motion, **stop and ask before any `image_edi
 2. **Three-shot recumbent editorial** — three hard-cut **landscape** photobook pages in a **supermodel recline**, still lying down: recumbent full-body cover, recumbent upper-body inner page, recumbent face close-up. Each shot holds its pose; hair and clothes blow in a side wind; every shot does a slow camera push-in.
 3. **Prone calf-swing / 趴卧摇腿** — one locked **side-camera** 16:9 full-body shot; she lies **prone on her stomach** on the ground; calves kick playfully back and forth; the upper body stays in **simple continuous motion** (forearm weight shift, slight head turn, tiny shoulder roll) then settles back — it must **not look frozen**; **facial expression changes**; **native loop** by pinning the **same** `$FULLBODY_STILL` as both `first_frame` and `last_frame` on `reference_to_video` (no timed 0.4 s / 5.4 s reset).
 
-Do not pick one silently. Do not start generating until they choose. Skip the question only when they already named one of these (选项 A / 横卧微动 / 对镜浅笑 / Motion A, or legacy 勾手 / come-hither → still use A still pose but prefer the new micro-act video unless they insist on curl; or 回眸 / 三镜头 / glance / 写真; or 趴卧 / 摇腿 / 趴着 / prone / calf-swing), or gave a different explicit motion (that explicit motion still overrides all three).
+Do not pick one silently. Do not start generating until they choose. Skip the question when they already named one of these (选项 A / 横卧微动 / 对镜浅笑 / Motion A, or legacy 勾手 / come-hither → still use A still pose but prefer the new micro-act video unless they insist on curl; or 回眸 / 三镜头 / glance / 写真; or 趴卧 / 摇腿 / 趴着 / prone / calf-swing), gave a different explicit motion (that explicit motion still overrides all three), **or sent a looping MP4 / folder of looping MP4s to convert to GIF**.
 
 ### Recumbent still first
 
 All three contracts **show the figure lying across the wide screen**. Before any video call, `$FULLBODY_STILL` must be a **16:9** still of the **same character** in that contract's pose (**Motion A:** pose-ref mid-recline crop is enough; **Motion B/C:** still require full-body for their contracts).
+
+### Identity lock (required)
+
+The figure in every generated still and video must stay **highly consistent** with the **user's original reference**. This is strictest on the **first-frame still** (`$FULLBODY_STILL`): crop and pose may change to the contract, but it must still be **that same person in that same drawing style**.
+
+Lock these from the original: face shape, eyes (color, shape), hair (color, length, style, ornaments), body type, outfit (cut, colors, materials, accessories), and **medium** (2D painterly / anime illustration stays 2D; do not convert to photoreal 3D or CGI, and vice versa).
+
+When `image_edit` creates that still: pass the reference **twice**; name those locked traits in the prompt. Then **compare the still side by side with the original reference**. Reject and redo if the face, hair, eyes, outfit, body type, or style drifted — including a prettier face, different eye color, restyled hair, slimmer body, or a photoreal restyle of an illustration.
+
+Do not invent a similar character. Video frames must keep this locked identity.
 
 - **Usable already (A):** framing and pose **highly match** `refs/motion-a-recline-pose-ref.png` — head left, body extending right, typically cropped around mid/upper thighs (feet **not** required); head, hair, both hands, torso, and the visible near thigh are in frame; **Motion A chin-hand recline** (torso and hips twisted toward the camera, supporting elbow on the ground with that hand under the chin, free hand on the upper thigh/hip (home pose)); far/lower leg may straighten and exit the right edge; landscape 16:9. **No background requirement** (keep source scene, pose-ref scene, or any clean backdrop — do not force #888888).
 - **Usable already (B):** head, hair, both hands, torso, legs, and feet (plus cape, tail, or other attached props) are all visible with small margins, the figure is in the **supermodel side-recline** (head one side, feet the other), and the frame is landscape. Motion B has **no background restriction** — keep the source environment.
@@ -189,7 +199,7 @@ Reject a still-image pan, zoom, scale, or parallax made in ffmpeg. The video cal
 
 ## 2. Produce the Source MP4 through Local Grok Imagine
 
-If the user supplies a usable MP4, use it as `$SOURCE_MP4` and start at Gate 1. Otherwise generate a real animated source with Imagine. Do not substitute a nonexistent `imagine-video` command or a still-image animation.
+If the user supplies a usable MP4, use it as `$SOURCE_MP4` and start at Gate 1. **If that MP4 already loops, skip Imagine and encode with the looping-source even-sample path.** Otherwise generate a real animated source with Imagine. Do not substitute a nonexistent `imagine-video` command or a still-image animation.
 
 **Preferred in a Grok Build / Grok TUI session:**
 
@@ -249,7 +259,7 @@ Reject a zero-byte, incomplete, static, or whole-frame-only scale/translation so
 - **~3–5 s / late-mid:** smile easing back / head returning; still same locked crop.
 - **Last frame:** matches `$FULLBODY_STILL` / first frame. Do **not** fail only because a mid timestamp is not yet on the home pose.
 
-Compare mid-clip frames to `$FULLBODY_STILL`, not only to each other. Reject and regenerate when the camera zooms away from the locked crop, stands the figure up, shows the figure tiny in a wide empty frame, has **no** head-turn/smile micro-act (frozen still), holds both eyes shut as the only face beat, snaps, changes garment class or coverage, slims or restyles the body, reintroduces a removed staff, or has a broken first/last loop seam.
+Compare mid-clip frames to `$FULLBODY_STILL` **and** the original user reference, not only to each other. Reject and regenerate when identity drifted (face, hair, eyes, outfit, body type, drawing style), the camera zooms away from the locked crop, stands the figure up, shows the figure tiny in a wide empty frame, has **no** head-turn/smile micro-act (frozen still), holds both eyes shut as the only face beat, snaps, changes garment class or coverage, slims or restyles the body, reintroduces a removed staff, or has a broken first/last loop seam.
 
 **Motion B:** Gate 1 each 6 s shot **before** trimming. Pose holds. Background stays the same as that shot's still; do not require #888888. Eyes open except one optional blink mid-shot on shot 3; the face clip must still contain open-eye frames at the end of the 1.7 s trim. Mid-clip must show **wind** in hair/clothes (shots 1–2 at least) and a **slow push-in** that is tighter than frame 0 but does **not** change shot class (full body still shows heels; upper still crown-to-hips; face still includes hair and neckline). Reject a frozen painting, a sit-up, a walk-out, a pull-back, a whip of hair, a push-in so hard that shot 1 becomes MCU, or an ffmpeg zoom. Regenerate the failed shot; do not repair motion with ffmpeg.
 
@@ -272,7 +282,7 @@ ffmpeg -hide_banner -loglevel error -sseof -0.04 -i "$SOURCE_MP4" \
 - Mid-clip (not endpoints): calves at a **different** swing angle than home; upper body not frozen; expression changed. Do **not** fail only because a mid timestamp is not yet on the home pose (loop is closed by `first_frame`=`last_frame`).
 - **~5.8 s:** still holding that start pose.
 
-Reject a zoom, pan, sit-up, crawl, stand, dance, overhead camera, A/B side-recline, a frozen torso (only calves moving), or a last frame that does not match the still. Compare mid-clip frames to `$FULLBODY_STILL`, not only to each other. Regenerate a failed source; do not repair motion with ffmpeg.
+Reject a zoom, pan, sit-up, crawl, stand, dance, overhead camera, A/B side-recline, a frozen torso (only calves moving), a last frame that does not match the still, or identity drift versus the original user reference. Compare mid-clip frames to `$FULLBODY_STILL` **and** the original, not only to each other. Regenerate a failed source; do not repair motion with ffmpeg.
 
 **Motion A has no background gate.** Do not reject on backdrop. Motion B has no default background contract — do not reject the source scene. Motion C: do not require #888888; reject only if the floor disappears or the original busy scene returns unasked. Never repair motion failures with ffmpeg. If the MP4 does not materialize, allow one concise Grok continuation naming the images, output path, required tool, and verification; then report failure rather than falling back.
 
@@ -282,11 +292,24 @@ Reject a zoom, pan, sit-up, crawl, stand, dance, overhead camera, A/B side-recli
 
 Render a **320×172** landscape GIF, 256 colours, infinite loop, **≤51 frames**.
 
-**If `$SOURCE_MP4` is ~6 s and its first and last frames already match** (same loop gate as Gate 2: endpoint MAE is not both above 12 and above 1.3× step MAE), it is a looping source. Even-sample **≤51 frames** from first source frame through last. Then, if the **tail is a long freeze** (consecutive frames whose step MAE is well below the clip's median step, and that already match the home pose), **drop extra still frames**. Keep a **short** home hold at the end (about 1–2 frames), not a long pause. Same optional trim on a long start hold, always keeping frame 0. **Do not force a target duration** — the GIF length is whatever remains. Do not stretch the leftover frames back to 6.0 s. Delays stay 100–120 ms to match the sample cadence.
+### Looping source — even-sample (required)
 
-**Otherwise** (source is not a 6 s loop): 10 fps, **≤51 frames**. Duration follows the kept window.
+Use this whenever `$SOURCE_MP4` already loops (Gate 2: endpoint MAE is not both above 12 and above 1.3× step MAE), including a **user-supplied looping MP4** and a generated clip whose first and last frames already match.
 
-**Motion A:** if the 6 s source already loops (first≈last as above), use that even-sample path, then drop extra still tail if needed. If it does not loop, trim a **real motion segment** (prefer the **longest** window at **320×172** whose blurred endpoint MAE is ≤ 16 and whose seam is either ≤ **1.3×** median consecutive-frame MAE or ≤ 12 absolute RGB MAE), **≤51 frames** @ 10 fps. A 6 s source often matches at ~60 frames but fails a 51-frame trim; then use the script's **assemble** plan. Do not add fade crossfades or static fake animation. If neither a trim nor an assemble pair passes, regenerate the source — hold the start pose longer at both ends — rather than shipping a jump.
+- If the user sent mixed videos and did not name a device: **16:9 / widescreen → RT85**; 9:16 / portrait → QK100; 1:1 → RT100 Pro.
+- Even-sample from source **frame 0 through the last frame**. GIF first = source first; GIF last = source last. Indices: `round(i * (N-1) / (n-1))` for `i = 0..n-1`.
+- `n = min(51, N)`. **Never** more than 51 frames.
+- Do **not** use `fps=10` (from 24 fps it drops 2-2-3 and can miss the last frame).
+- Scale only: `scale=320:172:flags=lanczos`. Do not crop. Do not pad/letterbox.
+- Delays 100–120 ms. If source duration / n is in that range, mix 110/120 to match source duration. If it would exceed 120 ms, use 120 ms (the GIF plays slightly faster; the whole clip is still in the 51 frames).
+- Palette 256 + `sierra2_4a`, `loop=0`. Do not copy the first frame onto the last.
+- User-supplied convert: write `output/rt85/<中文名>-rt85.gif` at the model-folder **root** (short Chinese name, no spaces, no per-video subfolder) unless the user asks for a folder.
+
+Generated **Motion C** only: after even-sample, if the **tail is a long freeze** of the home pose, drop extra still frames and keep 1–2 home frames. Duration follows what remains. Do not stretch leftovers back to 6.0 s. Do not apply that tail-drop to a user-supplied convert unless they ask.
+
+**Otherwise** (source is not a loop): 10 fps, **≤51 frames**. Duration follows the kept window.
+
+**Motion A:** if the source already loops (first≈last as above), use the looping-source even-sample path. If it does not loop, trim a **real motion segment** (prefer the **longest** window at **320×172** whose blurred endpoint MAE is ≤ 16 and whose seam is either ≤ **1.3×** median consecutive-frame MAE or ≤ 12 absolute RGB MAE), **≤51 frames** @ 10 fps. A 6 s source often matches at ~60 frames but fails a 51-frame trim; then use the script's **assemble** plan. Do not add fade crossfades or static fake animation. If neither a trim nor an assemble pair passes, regenerate the source — hold the start pose longer at both ends — rather than shipping a jump.
 
 ```zsh
 SEARCH=""
@@ -309,7 +332,7 @@ ffmpeg -hide_banner -loglevel error -i "$SOURCE_MP4" -ss "$START" -t "$DURATION"
 
 **Motion B:** do not run `search_rt85_loop.py` over one 6 s clip. From each approved shot, extract 10 fps **320×172** frames covering wind + push-in: **16** from full-body, **17** from upper, **17** from face (1.6 + 1.7 + 1.7 s). The **17th face frame must show eyes open**; if it is a blink, pick a different 1.7 s window. Concatenate full-body, then upper-body, then face, then **one** copy of the first full-body frame (**51 frames**). Palette-GIF that sequence (`loop=0`). Do not time-stretch with `setpts`. Hard cuts only. Never add the push-in in ffmpeg.
 
-**Motion C:** do not run `search_rt85_loop.py`. The 6 s source must already loop (Gate 1 last frame is home). Even-sample ≤51 frames from t=0 through the last source frame, scale/crop to 320×172, then **drop extra still frames at the end** if that hold is long — keep 1–2 home frames. Duration is whatever remains. Palette-GIF (`loop=0`). If first/last of the source do not match, regenerate the source; do not even-sample a jumping clip and do not copy the first frame onto the tail.
+**Motion C:** do not run `search_rt85_loop.py`. The 6 s source must already loop (Gate 1 last frame is home). Use the looping-source even-sample path (≤51, scale-only, first and last kept), then **drop extra still frames at the end** if that hold is long — keep 1–2 home frames. If first/last of the source do not match, regenerate the source; do not even-sample a jumping clip and do not copy the first frame onto the tail.
 
 Prefer regenerating the source video when the loop visibly jumps. Do not depend on a fragile post-production crossfade.
 
@@ -346,6 +369,8 @@ Motion A: no background check after palette conversion. Motion B: keep the sourc
 ## 4. Mandatory Post-Delivery Cleanup
 
 After Gate 2 passes, clean up the current run before reporting completion.
+
+**Convert-only** of a user-supplied looping MP4: keep `output/rt85/<中文名>-rt85.gif`. Do not copy the user's original into the output folder unless they asked.
 
 **Motion A — keep two files** in `$RUN_DIR`:
 

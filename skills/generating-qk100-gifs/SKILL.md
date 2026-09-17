@@ -9,7 +9,7 @@ description: >
 
 # Generating QK100 Mk2 GIFs
 
-For every QK100 / QK100 Mk2 request, follow this fixed pipeline in order: inspect the supplied still; **if it is not a full-body photo, first generate a full-body still of the same character**; generate a **native looping** source video **only from that full-body still** (first and last frame pinned to the same image); approve the source animation; render the GIF; approve the delivery file; then perform mandatory post-delivery cleanup. The user may override motion, framing, duration, or mood, but never the **135×240** resolution spec, the full-body-still-before-video rule, the **native first+last-frame loop**, the source-video and final-file quality gates, or the final cleanup requirement.
+For every QK100 / QK100 Mk2 request, follow this fixed pipeline in order: inspect the supplied still; **if it is not a full-body photo, first generate a full-body still of the same character**; generate a **native looping** source video **only from that full-body still** (first and last frame pinned to the same image); approve the source animation; render the GIF; approve the delivery file; then perform mandatory post-delivery cleanup. The user may override motion, framing, duration, or mood, but never the **135×240** resolution spec, the full-body-still-before-video rule, the **native first+last-frame loop**, the source-video and final-file quality gates, or the final cleanup requirement. **Convert-only exception:** a user-supplied looping MP4 skips still generation and Imagine — encode with the looping-source even-sample path.
 
 ## Product facts (researched)
 
@@ -25,7 +25,7 @@ These numbers come from QK family LCD documentation and must be used strictly:
 | Aspect | **exactly 9:16** | Official [QK100 Wireless PCB Guide](https://qwertykeys.notion.site/QK100-Wireless-PCB-Guide-2a172f718bf14d1b8e8679b5f12a96a7): “the best ratio is **9:16**”; other ratios are cropped or shrunk |
 | Orientation | **portrait** (tall strip between the main cluster and numpad) | Same LCD family as original QK100; Mk2 keeps a vertical GIF / Dynamic Island panel |
 | Max frames | **128** | QK100 LCD notes: “128 프레임까지 지원” |
-| Frame rate | **10 fps** (100 ms/frame) | Delivery cadence used by this pipeline |
+| Frame rate | **10 fps** (100 ms/frame) | Looping source: even-sample (not `fps=10`); delays 100 ms |
 | Loop | **infinite** (`loop=0`) | Required |
 | Colors | **256** palette GIF | `palettegen` + `sierra2_4a` |
 | Soft size ceiling | **~2.5 MB** | Shrink if QK Config rejects the file |
@@ -47,9 +47,19 @@ Inspect the supplied image or video. If neither is supplied, ask for one. Keep a
 Before any `reference_to_video` call, decide whether the user still already shows the **entire character**:
 
 - **Full body already:** head, hair, both hands, torso, legs, and feet (plus cape, tail, weapon, or other attached props) are all visible with usable margins. Use that image (after 9:16 / home-pose edit if needed) as `$FULLBODY_STILL`.
-- **Not full body:** half-body, chest-up, headshot, seated crop, missing feet, or any cut-off limbs. **Do not animate this crop.** First generate a new **9:16 full-body photograph/illustration** of the **same character** with `image_edit` (preferred in Grok Build) or Imagine image editing via `grok --single`. Preserve exact face, hair, outfit, body type, and style. Complete the unseen lower body consistently with the visible costume. Compact upright **home pose**: feet together, arms relaxed at the sides, small margins, never overhead. Save it as `output/qk100/*-fullbody.png`. Inspect the new still: if feet, head, or hands are still missing, edit once more. Only then set `$FULLBODY_STILL` to this generated file.
+- **Not full body:** half-body, chest-up, headshot, seated crop, missing feet, or any cut-off limbs. **Do not animate this crop.** First generate a new **9:16 full-body photograph/illustration** of the **same character** with `image_edit` (preferred in Grok Build) or Imagine image editing via `grok --single`. Follow **Identity lock**. Complete the unseen lower body consistently with the visible costume. Compact upright **home pose**: feet together, arms relaxed at the sides, small margins, never overhead. Save it as `output/qk100/*-fullbody.png`. Inspect the new still **against the original reference**: if feet, head, or hands are still missing, or Identity lock failed, edit once more. Only then set `$FULLBODY_STILL` to this generated file.
 
 Never call `reference_to_video` / `image_to_video` on a non-full-body user crop. Never invent a different character.
+
+### Identity lock (required)
+
+The figure in every generated still and video must stay **highly consistent** with the **user's original reference**. This is strictest on the **first-frame still** (`$FULLBODY_STILL`): crop and pose may change to the home pose / 9:16, but it must still be **that same person in that same drawing style**.
+
+Lock these from the original: face shape, eyes (color, shape), hair (color, length, style, ornaments), body type, outfit (cut, colors, materials, accessories), and **medium** (2D painterly / anime illustration stays 2D; do not convert to photoreal 3D or CGI, and vice versa).
+
+When `image_edit` creates that still: pass the reference **twice**; name those locked traits in the prompt. Then **compare the still side by side with the original reference**. Reject and redo if the face, hair, eyes, outfit, body type, or style drifted — including a prettier face, different eye color, restyled hair, slimmer body, or a photoreal restyle of an illustration.
+
+Video frames must keep this locked identity.
 
 ### Portrait composition (required)
 
@@ -81,12 +91,12 @@ Hair, clothing, cape, and jewelry follow a half-beat behind. For clearly adult c
 
 ## 2. Produce the Source MP4 through Local Grok Imagine
 
-If the user supplies a usable MP4, use it as `$SOURCE_MP4` and start at Gate 1. Otherwise generate a real animated source with Grok Build **`reference_to_video`** (`first_frame`=`last_frame`=`$FULLBODY_STILL`). Do not substitute a nonexistent `imagine-video` command or a still-image animation.
+If the user supplies a usable MP4, use it as `$SOURCE_MP4` and start at Gate 1. **If that MP4 already loops, skip Imagine and encode with the looping-source even-sample path.** Otherwise generate a real animated source with Grok Build **`reference_to_video`** (`first_frame`=`last_frame`=`$FULLBODY_STILL`). Do not substitute a nonexistent `imagine-video` command or a still-image animation.
 
 **Preferred in a Grok Build / Grok TUI session:**
 
 1. Resolve `$FULLBODY_STILL` as above. If the user image was not full body, this **must** be the newly generated full-body still, not the original crop.
-2. If `$FULLBODY_STILL` is full body but not yet the dance **home pose** or not 9:16, `image_edit` it into a **full-body home pose**: feet together, arms relaxed at the sides, compact, facing camera. Do **not** convert the pose to overhead hands or crop to chest-up.
+2. If `$FULLBODY_STILL` is full body but not yet the dance **home pose** or not 9:16, `image_edit` it into a **full-body home pose**: feet together, arms relaxed at the sides, compact, facing camera. Follow **Identity lock**. Do **not** convert the pose to overhead hands or crop to chest-up. Compare the result with the original reference before using it.
 3. Call **`reference_to_video`** on `$FULLBODY_STILL` (locked camera, ~6 s unless the user sets duration) with **`first_frame`=`last_frame`=`$FULLBODY_STILL`**. The video prompt must require **full body in every frame** and every default-phrase beat (shoulder-fist bounce, hip-pop camera-push, chest-frame) unless the user overrides motion — mid-clip action only, no timed return hard gate. Copy the MP4 to `output/qk100/*-source.mp4`.
 
 **Otherwise (Codex or shell-only):**
@@ -112,21 +122,27 @@ ffmpeg -hide_banner -loglevel error -ss "$(ffprobe -v error -show_entries format
 ffmpeg -hide_banner -loglevel error -sseof -0.04 -i "$SOURCE_MP4" -frames:v 1 output/qk100/source-check/late.png
 ```
 
-Reject a zero-byte, incomplete, static, or whole-frame-only scale/translation source. When the default loop-dance contract applies, early / middle / late frames must show the **entire body** (head, hands, feet, and attached props) inside the **9:16** frame. Mid-clip must show the default phrase. Do **not** hard-fail on first≈last pixel MAE — the loop is closed by `first_frame`=`last_frame`=`$FULLBODY_STILL`. The middle frame must show the default phrase: a **shoulder-fist bounce** and/or the **hip-pop + camera-push**, with springy knees. Reject chest-up crops, cropped feet or head, overhead hands, frozen arms, a sleepy or near-still sway, missing hip-pop, missing bounce, or abrupt snaps. If motion/identity fails, regenerate with `reference_to_video` and `first_frame`=`last_frame`=`$FULLBODY_STILL`. Do not treat endpoint MAE as a hard loop gate. Never repair with ffmpeg.
+Reject a zero-byte, incomplete, static, or whole-frame-only scale/translation source. **Convert-only** of a user-supplied looping MP4: probe decode, confirm first≈last (same Gate 2 loop test), then even-sample — do not require the default dance phrase.
+
+When the default loop-dance contract applies, also reject identity drift versus the **original user reference** (face, hair, eyes, outfit, body type, drawing style). Early / middle / late frames must show the **entire body** (head, hands, feet, and attached props) inside the **9:16** frame. Mid-clip must show the default phrase. Do **not** hard-fail on first≈last pixel MAE for a generated native loop — the loop is closed by `first_frame`=`last_frame`=`$FULLBODY_STILL`. The middle frame must show the default phrase: a **shoulder-fist bounce** and/or the **hip-pop + camera-push**, with springy knees. Reject chest-up crops, cropped feet or head, overhead hands, frozen arms, a sleepy or near-still sway, missing hip-pop, missing bounce, or abrupt snaps. If motion/identity fails, regenerate with `reference_to_video` and `first_frame`=`last_frame`=`$FULLBODY_STILL`. Do not treat endpoint MAE as a hard loop gate on generated native-loop sources. Never repair with ffmpeg.
 
 ## 3. Render the QK100 Mk2 GIF
 
-Render a **strict 135×240** portrait GIF at **10 fps**, 256 colours, infinite loop. **Even-sample** the full source uniformly into the frame budget (default ~60 frames from ~6 s; always **≤128**). Do **not** irregularly skip frames. Do **not** trim off the pinned last frame as a seam hack.
+Render a **strict 135×240** portrait GIF, 256 colours, infinite loop, **≤128 frames**. **Even-sample** the full source uniformly into the frame budget (default ~60 frames from ~6 s; always **≤128**). Do **not** irregularly skip frames. Do **not** trim off the pinned last frame as a seam hack.
 
-Use cover-crop so non-9:16 sources fill the tall panel without letterboxing, then **force 135×240**:
+### Looping source — even-sample (required)
 
-```zsh
-ffmpeg -hide_banner -loglevel error -i "$SOURCE_MP4" \
-  -filter_complex "[0:v]fps=10,scale=135:240:force_original_aspect_ratio=increase:flags=lanczos,crop=135:240,split[frames][palette_source];[palette_source]palettegen=max_colors=256:stats_mode=diff[palette];[frames][palette]paletteuse=dither=sierra2_4a" \
-  -loop 0 "$OUTPUT_GIF"
-```
+Use this whenever `$SOURCE_MP4` already loops (Gate 2: endpoint MAE is not both above 12 and above 1.3× step MAE), including a **user-supplied looping MP4**.
 
-If mid-clip motion fails, regenerate with `reference_to_video` and `first_frame`=`last_frame`=`$FULLBODY_STILL`; do not add fades or static fake animation.
+- If the user sent mixed videos and did not name a device: **9:16 / portrait → QK100**; 16:9 / widescreen → RT85; 1:1 → RT100 Pro.
+- Even-sample from source **frame 0 through the last frame**. GIF first = source first; GIF last = source last. Indices: `round(i * (N-1) / (n-1))` for `i = 0..n-1`.
+- `n = min(128, N, max(2, round(duration_seconds * 10)))`. **Never** more than 128 frames. If duration × 10 would exceed 128, even-sample 128 across the whole clip (plays slightly faster).
+- Do **not** use `fps=10` (from 24 fps it drops 2-2-3 and can miss the last frame).
+- Scale only: `scale=135:240:flags=lanczos`. Do not crop. Do not pad/letterbox.
+- Every frame delay **100 ms**. Palette 256 + `sierra2_4a`, `loop=0`. Do not copy the first frame onto the last.
+- User-supplied convert: write `output/qk100/<中文名>-qk100.gif` at the model-folder **root** (short Chinese name, no spaces, no per-video subfolder) unless the user asks for a folder.
+
+If mid-clip motion fails on a **generated** source, regenerate with `reference_to_video` and `first_frame`=`last_frame`=`$FULLBODY_STILL`; do not add fades or static fake animation. A user-supplied clip that does not loop is not this path.
 
 Never scale to 240×240, 320×172, or 240×135.
 
@@ -150,10 +166,12 @@ State the final path, **135×240**, duration, frame count, and file size. Upload
 
 ## 4. Mandatory Post-Delivery Cleanup
 
-After Gate 2 passes, keep exactly these two current-run deliverables in `output/qk100/`:
+After Gate 2 passes, keep exactly these two current-run deliverables in `output/qk100/` for a **generated** run:
 
 - the final Grok-generated source video, named `*-source.mp4`;
 - the final verified QK100 GIF, named `*-qk100.gif`.
+
+**Convert-only** of a user-supplied looping MP4: keep the GIF at `output/qk100/<中文名>-qk100.gif`. Do not copy the user's original into the output folder unless they asked.
 
 Delete every other resource created for that run: generated `*-fullbody` stills, 9:16 reference images, source-check frames, contact sheets, failed candidates, and loop diagnostics. Use an explicit per-run manifest; never wildcard-delete unrelated historical files. Do not clean up until Gate 2 passes.
 
