@@ -3,7 +3,7 @@ name: generating-rt100pro-gifs
 description: >
   Create, animate, convert, or optimize a GIF for the EPOMAKER RT100 Pro keyboard
   screen from a reference image or video. Use for keyboard mini-screen GIFs,
-  Grok Imagine image_to_video / reference_to_video animation, loop dance source
+  Grok Build `reference_to_video` (native loop via first_frame=last_frame), assembled Motion B loops unchanged
   MP4s, three-shot editorial GIFs, 240x240 delivery GIFs, RT100 Pro upload-ready
   media, or when the user runs /generating-rt100pro-gifs.
 ---
@@ -43,7 +43,7 @@ Avoid text or logos unless requested.
 
 Use this contract only after the user chose it (or named equivalent motion such as 踏步舞 / step-touch / dance loop).
 
-The compact four-count step-touch choreography is derived from the 00:00.8–00:02.4 passage of `xnd10731_20260824_reel_3970514467695117755_1_3970514467695117755.mp4`. Start centred and upright with the feet close, elbows softly bent about 90 degrees, forearms lifted beside the torso, and relaxed hands near shoulder height. On count one, make a small step-touch to one side with a soft knee bounce and matching hip shift while both elbows and forearms pulse lightly outward and upward. On count two, pass smoothly through centre and mirror the step-touch, hip shift, and arm pulse to the other side. On count three, repeat the alternating rhythm with a subtle counter-rolling shoulder accent and a small natural head tilt; keep the wrists loose and the hands expressive rather than clenched or rigid. On count four, bring both feet, hips, shoulders, elbows, hands, and head back to the exact starting pose. Repeat this four-count cycle exactly twice during the first 5.4 seconds, returning to the starting pose at the end of each cycle and no later than 5.4 seconds. Hold that pose from 5.4 to 6.0 seconds with only near-imperceptible breathing; this protected tail ensures the 10 fps delivery GIF includes a clean reset frame. Keep the rhythm buoyant and even, the movement compact, and the subject facing mostly forward.
+The compact four-count step-touch choreography is derived from the 00:00.8–00:02.4 passage of `xnd10731_20260824_reel_3970514467695117755_1_3970514467695117755.mp4`. Start centred and upright with the feet close, elbows softly bent about 90 degrees, forearms lifted beside the torso, and relaxed hands near shoulder height. On count one, make a small step-touch to one side with a soft knee bounce and matching hip shift while both elbows and forearms pulse lightly outward and upward. On count two, pass smoothly through centre and mirror the step-touch, hip shift, and arm pulse to the other side. On count three, repeat the alternating rhythm with a subtle counter-rolling shoulder accent and a small natural head tilt; keep the wrists loose and the hands expressive rather than clenched or rigid. On count four, bring both feet, hips, shoulders, elbows, hands, and head back toward the starting pose. Repeat this four-count cycle about twice across the mid-clip. **Native loop:** `reference_to_video` with `first_frame`=`last_frame`=the square still closes the seam — do **not** require a timed return by 5.4 s or a protected 5.4–6.0 s tail. Keep the rhythm buoyant and even, the movement compact, and the subject facing mostly forward.
 
 For the 1.54-inch screen, prioritize the face, upper torso, hands, hip shift, and enough of the legs to make the step-touch and knee bounce readable. Show the full body only when it remains legible at 240x240.
 
@@ -73,7 +73,7 @@ If the user supplies a usable MP4, use it as `$SOURCE_MP4` and start at Gate 1. 
 
 **Preferred in a Grok Build / Grok TUI session:** call the native video tool directly. For Motion A when the default background contract applies, always use `image_edit` first—even for an already-square input—to isolate the subject, remove the source background, and create the square flat solid #888888 reference. Pass the still **twice** when requesting `1:1` so the aspect is honored. For Motion B, square the page stills without replacing the original scene.
 
-**Motion A:** one locked-camera `image_to_video` from that square still. Copy the MP4 to `$RUN_DIR/*-source.mp4`.
+**Motion A (native loop — Grok Build):** call **`reference_to_video`** (1:1, ~6 s) with **`first_frame` and `last_frame` both set to the same square still** (`$FULLBODY_STILL` / edited square). **Forbidden:** `image_to_video`-only fake loops. Mid-clip prompt writes the in-place dance only — **no** timed 0.4 s / 5.4 s return hard gate (the identical first/last still closes the loop). Copy the MP4 to `$RUN_DIR/*-source.mp4`.
 
 **Motion B:** do not animate the original crop. After the square cover still, inner still, and face still (original scenes kept), one 6 s clip per page:
 
@@ -91,7 +91,7 @@ grok --single "$PROMPT" --max-turns 8 --permission-mode auto --always-approve \
 
 If no Imagine video tool is available, report `IMAGE_TO_VIDEO_UNAVAILABLE` and stop. Never replace it with zoom, pan, scale, parallax, a slideshow, or another static-image fallback MP4/GIF.
 
-For Motion A, request one locked-camera, 1:1, 6-second source MP4. The generation prompt must name the supplied/edited image, every count of the step-touch choreography, two complete repetitions ending in the exact starting pose no later than 5.4 seconds, the protected 5.4–6.0-second tail, the #888888 background contract when it applies, and the exact output path. For Motion B, name the page still, the held photobook pose, the idle (breath / weight / shoulder as that shot requires), eyes staying open, side wind, slow push-in that does not change shot class, stable original scene, and output path on each of the three calls. Do not rely on camera motion **alone** to simulate animation.
+For Motion A, request one locked-camera, 1:1, ~6-second source via **`reference_to_video`** with `first_frame`=`last_frame`=the square still. The generation prompt must name the supplied/edited image, the in-place step-touch / dance beats **between** those identical frames, the #888888 background contract when it applies, and the exact output path — **do not** require a timed return by 5.4 seconds or a protected 5.4–6.0-second tail. For Motion B, name the page still, the held photobook pose, the idle (breath / weight / shoulder as that shot requires), eyes staying open, side wind, slow push-in that does not change shot class, stable original scene, and output path on each of the three calls. Do not rely on camera motion **alone** to simulate animation.
 
 ## Gate 1 — Approve the Source Before Converting
 
@@ -103,13 +103,13 @@ ffprobe -v error -show_entries format=duration:stream=codec_name,width,height \
 mkdir -p "$RUN_DIR/source-check"
 ffmpeg -hide_banner -loglevel error -ss 0 -i "$SOURCE_MP4" -frames:v 1 "$RUN_DIR/source-check/early.png"
 ffmpeg -hide_banner -loglevel error -ss 3 -i "$SOURCE_MP4" -frames:v 1 "$RUN_DIR/source-check/middle.png"
-ffmpeg -hide_banner -loglevel error -ss 5.4 -i "$SOURCE_MP4" -frames:v 1 "$RUN_DIR/source-check/loop-boundary.png"
+ffmpeg -hide_banner -loglevel error -sseof -0.04 -i "$SOURCE_MP4" -frames:v 1 "$RUN_DIR/source-check/loop-boundary.png"
 ffmpeg -hide_banner -loglevel error -ss 5.8 -i "$SOURCE_MP4" -frames:v 1 "$RUN_DIR/source-check/late.png"
 ```
 
 Reject a zero-byte, incomplete, static, or whole-frame-only scale/translation source.
 
-**Motion A:** inspect enough intermediate frames to confirm two complete four-count cycles before 5.4 seconds: alternating left-right step-touches, soft knee bounces, matching hip shifts, shoulder-height outward/upward forearm pulses, the shoulder counter-roll, and the exact centred reset pose. The hands must remain inside the square and the feet must stay grounded without sliding. The frame at 5.4 seconds must match the first frame in foot placement, hip position, head angle, elbow bend, hand position, and motion follow-through; frames from 5.4 to 6.0 seconds must hold that pose without drift. Reject and regenerate a source with missing or uneven side changes, rigid arms, spins, jumps, travelling, abrupt snaps, or a visible loop jump.
+**Motion A:** inspect mid-clip frames for readable in-place dance: alternating left-right step-touches, soft knee bounces, matching hip shifts, shoulder-height outward/upward forearm pulses, and the shoulder counter-roll. Hands stay inside the square; feet stay grounded without sliding. Do **not** fail only because a mid timestamp is not on the home pose — the loop is closed by `first_frame`=`last_frame`. Reject and regenerate a source with missing dance, rigid arms, spins, jumps, travelling, abrupt snaps, or when `first_frame`/`last_frame` were not both set to the same still.
 
 **Motion B:** Gate 1 each 6 s shot **before** trimming. Page pose holds. Original scene stays stable every frame. Eyes stay open on every shot. Mid-clip must show **idle** readable at square framing (breath / weight on shot 1; breath / shoulder or waist-hand on shot 2; breath on shot 3), **wind** in hair/clothes, and a **slow push-in** that is tighter than frame 0 but does **not** change shot class (full body still shows feet; upper still crown-to-hips; face still includes hair). Reject a frozen painting, a blink in a selected window, a full 回身 replayed on every shot, a walk-out, a pull-back, a whip of hair, a push-in so hard that shot 1 becomes MCU, or an ffmpeg zoom. If a clip blinks, choose a fully open-eye span or regenerate that shot; do not repair motion with ffmpeg.
 
@@ -119,12 +119,15 @@ When the Motion A default background contract applies, Gate 1 must also confirm 
 
 Render a 240x240 GIF at 10 fps, 256 colours, infinite loop, and at most 5.5 seconds. This yields no more than 55 frames, within the RT100 Pro 56-frame limit.
 
-**Motion A:** the sampled frames normally run from 0.0 through 5.4 seconds, so the step-touch completes and holds its reset by 5.4 seconds. The remaining source tail is deliberately trimmed here. Do not run a loop-window search: the choreography is time-locked, and a pixel-best seam can drop a cycle. If the 0–5.5 s GIF jumps, regenerate the source so it resets at 5.4 s. Do not search Motion B. Do not search when the user asked to keep a supplied clip in full.
+**Motion A (even-sample):** regardless of source duration, **uniformly** sample into **≤55 frames** (RT100 Pro budget) — do **not** irregularly skip frames and do **not** run a pixel-best loop-window search as the primary path. If the GIF loop jumps, regenerate the source with `first_frame`=`last_frame`=the square still. Do not search Motion B. Do not search when the user asked to keep a supplied clip in full.
 
 ```zsh
-ffmpeg -hide_banner -loglevel error -t 5.5 -i "$SOURCE_MP4" \
-  -filter_complex "[0:v]fps=10,scale=240:240:flags=lanczos,split[frames][palette_source];[palette_source]palettegen=max_colors=256:stats_mode=diff[palette];[frames][palette]paletteuse=dither=sierra2_4a" \
-  -loop 0 "$OUTPUT_GIF"
+# Even-sample the FULL clip into ≤55 frames (example: fps≈min(10, 55/DUR); do not -t 5.5 trim as the primary path)
+DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$SOURCE_MP4")
+FPS=$(python3 -c "d=float('$DUR'); print(min(10, 55/d) if d>0 else 10)")
+ffmpeg -hide_banner -loglevel error -i "$SOURCE_MP4" \
+  -filter_complex "[0:v]fps=${FPS},scale=240:240:flags=lanczos,split[frames][palette_source];[palette_source]palettegen=max_colors=256:stats_mode=diff[palette];[frames][palette]paletteuse=dither=sierra2_4a" \
+  -frames:v 55 -loop 0 "$OUTPUT_GIF"
 ```
 
 **Motion B:** do not run a single `-t 5.5` over one 6 s clip. From each approved shot, extract 10 fps 240×240 frames covering idle + wind + push-in: **10** from full-body, **20** from upper, **20** from face (1.0 + 2.0 + 2.0 s). Concatenate full-body, then upper-body, then face, then **one** copy of the first full-body frame (51 frames). Palette-GIF that sequence (`loop=0`). Do not time-stretch with `setpts`. Hard cuts only. Never add the push-in in ffmpeg.
